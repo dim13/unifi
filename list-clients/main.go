@@ -6,11 +6,6 @@ import (
 	"github.com/dim13/unifi"
 )
 
-type Roaming struct {
-	Ap      string
-	Channel int
-}
-
 func getname(s unifi.Sta) string {
 	if s.Hostname != "" {
 		return s.Hostname
