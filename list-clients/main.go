@@ -6,16 +6,6 @@ import (
 	"github.com/dim13/unifi"
 )
 
-func getname(s unifi.Sta) string {
-	if s.Hostname != "" {
-		return s.Hostname
-	}
-	if s.Ip != "" {
-		return s.Ip
-	}
-	return s.Mac
-}
-
 func main() {
 	user := flag.String("user", "admin", "User")
 	pass := flag.String("pass", "unifi", "Password")
@@ -34,6 +24,6 @@ func main() {
 
 	sta := u.GetClients()
 	for _, v := range sta {
-		fmt.Printf("%s at %s/%d\n", getname(v), apmap[v.Ap_mac], v.Channel)
+		fmt.Printf("%s at %s/%d\n", v.GetName(), apmap[v.Ap_mac], v.Channel)
 	}
 }
