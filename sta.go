@@ -77,3 +77,13 @@ type Sta struct {
 	Uptime             int
 	User_id            string
 }
+
+func (s Sta) GetName() string {
+	if s.Hostname != "" {
+		return s.Hostname
+	}
+	if s.Ip != "" {
+		return s.Ip
+	}
+	return s.Mac
+}
