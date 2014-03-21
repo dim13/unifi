@@ -12,18 +12,11 @@ func main() {
 	url := flag.String("url", "unifi", "URL")
 	flag.Parse()
 
-	u := new(unifi.Unifi)
-	u.Login(*user, *pass, *url)
+	u := unifi.Login(*user, *pass, *url)
 	defer u.Logout()
 
-	aps := u.GetAps()
-	apmap := make(map[string]string)
-	for _, ap := range aps {
-		apmap[ap.Mac] = ap.Name
-	}
-
-	sta := u.GetClients()
-	for _, v := range sta {
-		fmt.Printf("%s at %s/%d\n", v.GetName(), apmap[v.Ap_mac], v.Channel)
+	aps := u.GetApsMap()
+	for _, s := range u.GetSta() {
+		fmt.Printf("%s at %s/%d\n", s.GetName(), aps[s.Ap_mac].Name, s.Channel)
 	}
 }

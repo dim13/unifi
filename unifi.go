@@ -23,15 +23,18 @@ type Meta struct {
 	Rc string
 }
 
-func (u *Unifi) Login(user, pass, host string) {
-	var err error
+func Login(user, pass, host string) *Unifi {
+	u := new(Unifi)
+	u.Login(user, pass, host)
+	return u
+}
 
+func (u *Unifi) Login(user, pass, host string) {
 	val := url.Values{
 		"login":    {"login"},
 		"username": {user},
 		"password": {pass},
 	}
-
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
@@ -41,9 +44,7 @@ func (u *Unifi) Login(user, pass, host string) {
 		Jar:       cj,
 	}
 	u.Host = "https://" + host + ":8443/"
-
-	_, err = u.Client.PostForm(u.Host+"login", val)
-	if err != nil {
+	if _, err := u.Client.PostForm(u.Host+"login", val); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -83,8 +84,7 @@ func (u *Unifi) maccmd(mac, cmd string, mgr ...string) {
 
 func (u *Unifi) parse(cmd string, v interface{}) {
 	body := u.apicmd(cmd)
-	err := json.Unmarshal(body, &v)
-	if err != nil {
+	if err := json.Unmarshal(body, &v); err != nil {
 		log.Fatal(err)
 	}
 	m := reflect.ValueOf(v).Elem().FieldByName("Meta").Interface().(Meta)
@@ -102,13 +102,29 @@ func (u *Unifi) GetAps() []Aps {
 	return response.Data
 }
 
-func (u *Unifi) GetClients() []Sta {
+func (u *Unifi) GetApsMap() map[string]Aps {
+	m := make(map[string]Aps)
+	for _, a := range u.GetAps() {
+		m[a.Mac] = a
+	}
+	return m
+}
+
+func (u *Unifi) GetSta() []Sta {
 	var response struct {
 		Data []Sta
 		Meta Meta
 	}
 	u.parse("stat/sta", &response)
 	return response.Data
+}
+
+func (u *Unifi) GetStaMap() map[string]Sta {
+	m := make(map[string]Sta)
+	for _, s := range u.GetSta() {
+		m[s.Mac] = s
+	}
+	return m
 }
 
 func (u *Unifi) GetUsers() []User {
@@ -134,15 +150,15 @@ func (u *Unifi) GetWlanConf() []WlanConf {
 	return response.Data
 }
 
-func (u *Unifi) BlockClient(mac string) {
+func (u *Unifi) BlockSta(mac string) {
 	u.maccmd(mac, "block-sta")
 }
 
-func (u *Unifi) UnBlockClient(mac string) {
+func (u *Unifi) UnBlockSta(mac string) {
 	u.maccmd(mac, "unblock-sta")
 }
 
-func (u *Unifi) DisconnectClient(mac string) {
+func (u *Unifi) DisconnectSta(mac string) {
 	u.maccmd(mac, "kick-sta")
 }
 
