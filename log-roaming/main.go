@@ -23,6 +23,7 @@ func main() {
 	user := flag.String("user", "admin", "User")
 	pass := flag.String("pass", "unifi", "Password")
 	url := flag.String("url", "unifi", "URL")
+	delay := flag.Int("delay", 5, "delay")
 	flag.Parse()
 
 	u := unifi.Login(*user, *pass, *url)
@@ -58,6 +59,6 @@ func main() {
 				v.Name, v.Ap, v.Channel, v.Essid, v.Ip)
 		}
 		stamap = newmap
-		time.Sleep(5 * time.Second)
+		time.Sleep(time.Duration(*delay) * time.Second)
 	}
 }
