@@ -17,6 +17,8 @@ func main() {
 
 	aps := u.GetApsMap()
 	for _, s := range u.GetSta() {
-		fmt.Printf("%s at %s/%d\n", s.GetName(), aps[s.Ap_mac].Name, s.Channel)
+		fmt.Printf("%24s%3s%12s%3d%5d%5d%5d%8s/%-3d%16s%4s\n",
+			s.GetName(), s.Radio, s.Essid, s.Roam_count, s.Signal, s.Noise, s.Rssi,
+			aps[s.Ap_mac].Name, s.Channel, s.Ip, aps[s.Ap_mac].Model)
 	}
 }
