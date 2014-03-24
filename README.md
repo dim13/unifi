@@ -1,7 +1,7 @@
 unifi
 =====
 
-Unifi Go API
+Ubiquiti Unifi Go API
 
 Port of https://github.com/calmh/unifi-api to Golang
 
