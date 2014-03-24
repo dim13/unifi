@@ -1,8 +1,8 @@
 package unifi
 
 import (
-	"time"
 	"strconv"
+	"time"
 )
 
 type Timestamp time.Time
