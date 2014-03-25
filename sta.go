@@ -2,6 +2,7 @@ package unifi
 
 /* Station data */
 type Sta struct {
+	u                  *Unifi
 	Ap_mac             string
 	Assoc_time         int //Timestamp
 	Auth_time          int //Timestamp
@@ -80,7 +81,7 @@ type Sta struct {
 }
 
 /* Returns a station name. */
-func (s Sta) GetName() string {
+func (s Sta) Name() string {
 	if s.Hostname != "" {
 		return s.Hostname
 	}
@@ -88,4 +89,16 @@ func (s Sta) GetName() string {
 		return s.Ip
 	}
 	return s.Mac
+}
+
+func (s Sta) Block() {
+	s.u.maccmd(s.Mac, "block-sta")
+}
+
+func (s Sta) UnBlock() {
+	s.u.maccmd(s.Mac, "unblock-sta")
+}
+
+func (s Sta) Disconnect() {
+	s.u.maccmd(s.Mac, "kick-sta")
 }

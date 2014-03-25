@@ -80,7 +80,7 @@ func (u *Unifi) maccmd(mac, cmd string, mgr ...string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%s %s\n", res, mgr[0])
+	fmt.Printf("%s: %s %s\n", u.host, res, mgr[0])
 	/* FIXME */
 }
 
@@ -96,45 +96,51 @@ func (u *Unifi) parse(cmd string, v interface{}) {
 }
 
 /* Returns a slice of access points. */
-func (u *Unifi) GetAps() []Aps {
+func (u *Unifi) Aps() []Aps {
 	var response struct {
 		Data []Aps
 		Meta meta
 	}
 	u.parse("stat/device", &response)
+	for i, _ := range response.Data {
+		response.Data[i].u = u
+	}
 	return response.Data
 }
 
 /* Returns a map of access points with mac as a key. */
-func (u *Unifi) GetApsMap() map[string]Aps {
+func (u *Unifi) ApsMap() map[string]Aps {
 	m := make(map[string]Aps)
-	for _, a := range u.GetAps() {
+	for _, a := range u.Aps() {
 		m[a.Mac] = a
 	}
 	return m
 }
 
 /* Returns a slice of stations. */
-func (u *Unifi) GetSta() []Sta {
+func (u *Unifi) Sta() []Sta {
 	var response struct {
 		Data []Sta
 		Meta meta
 	}
 	u.parse("stat/sta", &response)
+	for i, _ := range response.Data {
+		response.Data[i].u = u
+	}
 	return response.Data
 }
 
 /* Returns a map of stations with MAC as a key. */
-func (u *Unifi) GetStaMap() map[string]Sta {
+func (u *Unifi) StaMap() map[string]Sta {
 	m := make(map[string]Sta)
-	for _, s := range u.GetSta() {
+	for _, s := range u.Sta() {
 		m[s.Mac] = s
 	}
 	return m
 }
 
 /* Returns a slice of known users. */
-func (u *Unifi) GetUsers() []User {
+func (u *Unifi) Users() []User {
 	var response struct {
 		Data []User
 		Meta meta
@@ -143,13 +149,13 @@ func (u *Unifi) GetUsers() []User {
 	return response.Data
 }
 
-func (u *Unifi) GetUserGroups() {
+func (u *Unifi) UserGroups() {
 	body := u.apicmd("list/usergroup")
 	fmt.Printf("%s\n", body)
 }
 
 /* Returns a Wlan config. */
-func (u *Unifi) GetWlanConf() []WlanConf {
+func (u *Unifi) WlanConf() []WlanConf {
 	var response struct {
 		Data []WlanConf
 		Meta meta
@@ -158,37 +164,8 @@ func (u *Unifi) GetWlanConf() []WlanConf {
 	return response.Data
 }
 
-func (u *Unifi) BlockSta(mac string) {
-	u.maccmd(mac, "block-sta")
-}
-
-func (u *Unifi) UnBlockSta(mac string) {
-	u.maccmd(mac, "unblock-sta")
-}
-
-func (u *Unifi) DisconnectSta(mac string) {
-	u.maccmd(mac, "kick-sta")
-}
-
-func (u *Unifi) RestartAP(mac string) {
-	u.maccmd(mac, "restart", "devmgr")
-}
-
-func (u *Unifi) RestartAPbyName(name string) {
-}
-
 func (u *Unifi) CreateBackup() {
 }
 
 func (u *Unifi) GetBackup() {
-}
-
-func (u *Unifi) Restart(mac string) {
-	type cmd struct {
-		Mac string
-		Cmd string
-	}
-
-	c := cmd{Mac: mac, Cmd: "restart"}
-	fmt.Println(c)
 }

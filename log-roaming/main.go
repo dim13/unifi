@@ -29,13 +29,13 @@ func main() {
 	u := unifi.Login(*user, *pass, *url)
 	defer u.Logout()
 
-	apsmap := u.GetApsMap()
+	apsmap := u.ApsMap()
 
 	for {
 		newmap := make(RoamMap)
-		for _, s := range u.GetSta() {
+		for _, s := range u.Sta() {
 			newmap[s.Mac] = Roaming{
-				Name:    s.GetName(),
+				Name:    s.Name(),
 				Ip:      s.Ip,
 				Ap:      apsmap[s.Ap_mac].Name,
 				Channel: s.Channel,

@@ -185,6 +185,7 @@ type Stat struct {
 
 /* Access point data */
 type Aps struct {
+	u                    *Unifi
 	Adopted              bool
 	Bytes                int
 	Cfgversion           string
@@ -243,4 +244,8 @@ type Aps struct {
 	X_fingerprint        string
 	X_vwirekey           string
 	Y                    int
+}
+
+func (a Aps) Restart() {
+	a.u.maccmd(a.Mac, "restart", "devmgr")
 }
