@@ -10,7 +10,7 @@ type DownlinkTable struct {
 }
 
 type RadioTable struct {
-	Antenna_gain     int `json:"-"` /* FIXME: buggy input, sometimes string and sometimes int */
+	Antenna_gain     int `json:"-"` // FIXME: buggy input, sometimes string and sometimes int
 	Builtin_ant_gain int
 	Builtin_antenna  bool
 	Channel          string
@@ -185,7 +185,7 @@ type Stat struct {
 
 type ApsMap map[string]Aps
 
-/* Access point data */
+// Access point datA
 type Aps struct {
 	u                    *Unifi
 	Adopted              bool
@@ -248,6 +248,7 @@ type Aps struct {
 	Y                    int
 }
 
+// Reboot access point
 func (a Aps) Restart() {
 	a.u.maccmd(a.Mac, "restart", "devmgr")
 }

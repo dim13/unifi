@@ -1,4 +1,4 @@
-/* in memory of http://memegenerator.net/instance/37313316 and https://xkcd.com/927/ */
+// in memory of http://memegenerator.net/instance/37313316 and https://xkcd.com/927/
 
 package unifi
 
@@ -23,7 +23,7 @@ type meta struct {
 	Rc string
 }
 
-/* Initializes a session. */
+// Initializes a session
 func Login(user, pass, host string) *Unifi {
 	u := new(Unifi)
 	u.login(user, pass, host)
@@ -50,7 +50,7 @@ func (u *Unifi) login(user, pass, host string) {
 	}
 }
 
-/* Terminates a session. */
+// Terminates a session
 func (u *Unifi) Logout() {
 	u.client.Get(u.host + "logout")
 }
@@ -95,7 +95,7 @@ func (u *Unifi) parse(cmd string, v interface{}) {
 	}
 }
 
-/* Returns a slice of access points. */
+// Returns a slice of access points
 func (u *Unifi) Aps() []Aps {
 	var response struct {
 		Data []Aps
@@ -108,7 +108,7 @@ func (u *Unifi) Aps() []Aps {
 	return response.Data
 }
 
-/* Returns a map of access points with mac as a key. */
+// Returns a map of access points with mac as a key
 func (u *Unifi) ApsMap() ApsMap {
 	m := make(ApsMap)
 	for _, a := range u.Aps() {
@@ -117,7 +117,7 @@ func (u *Unifi) ApsMap() ApsMap {
 	return m
 }
 
-/* Returns a slice of stations. */
+// Returns a slice of stations
 func (u *Unifi) Sta() []Sta {
 	var response struct {
 		Data []Sta
@@ -130,7 +130,7 @@ func (u *Unifi) Sta() []Sta {
 	return response.Data
 }
 
-/* Returns a map of stations with MAC as a key. */
+// Returns a map of stations with MAC as a key
 func (u *Unifi) StaMap() StaMap {
 	m := make(StaMap)
 	for _, s := range u.Sta() {
@@ -139,7 +139,7 @@ func (u *Unifi) StaMap() StaMap {
 	return m
 }
 
-/* Returns a slice of known users. */
+// Returns a slice of known users
 func (u *Unifi) Users() []User {
 	var response struct {
 		Data []User
@@ -154,7 +154,7 @@ func (u *Unifi) UserGroups() {
 	fmt.Printf("%s\n", body)
 }
 
-/* Returns a Wlan config. */
+// Returns a Wlan config
 func (u *Unifi) WlanConf() []WlanConf {
 	var response struct {
 		Data []WlanConf

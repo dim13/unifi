@@ -2,7 +2,7 @@ package unifi
 
 type StaMap map[string]Sta
 
-/* Station data */
+// Station data
 type Sta struct {
 	u                  *Unifi
 	Ap_mac             string
@@ -82,7 +82,7 @@ type Sta struct {
 	User_id            string
 }
 
-/* Returns a station name. */
+// Returns a station name
 func (s Sta) Name() string {
 	if s.Hostname != "" {
 		return s.Hostname
