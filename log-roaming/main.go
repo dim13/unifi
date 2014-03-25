@@ -20,13 +20,11 @@ type roamMap map[string]roaming
 var stamap roamMap
 
 var (
-	user = flag.String("user", "admin", "User")
-	pass = flag.String("pass", "unifi", "Password")
-	url = flag.String("url", "unifi", "URL")
+	user  = flag.String("user", "admin", "User")
+	pass  = flag.String("pass", "unifi", "Password")
+	url   = flag.String("url", "unifi", "URL")
 	delay = flag.Int("delay", 5, "delay")
 )
-
-
 
 func main() {
 	flag.Parse()
