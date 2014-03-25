@@ -47,10 +47,10 @@ func main() {
 		}
 		for k, v := range newmap {
 			if z, ok := stamap[k]; !ok {
-				log.Printf("%s appears on %s/%d (%s/%s)\n",
+				log.Printf("→ %s appears on %s/%d (%s/%s)\n",
 					v.Name, v.Ap, v.Channel, v.Essid, v.Ip)
 			} else if z != v {
-				log.Printf("%s roams %s/%d (%s/%s) -> %s/%d (%s/%s)\n",
+				log.Printf("↔ %s roams %s/%d (%s/%s) → %s/%d (%s/%s)\n",
 					v.Name,
 					z.Ap, z.Channel, z.Essid, z.Ip,
 					v.Ap, v.Channel, v.Essid, v.Ip)
@@ -58,7 +58,7 @@ func main() {
 			delete(stamap, k)
 		}
 		for _, v := range stamap {
-			log.Printf("%s vanishes from %s/%d (%s/%s)\n",
+			log.Printf("← %s vanishes from %s/%d (%s/%s)\n",
 				v.Name, v.Ap, v.Channel, v.Essid, v.Ip)
 		}
 		stamap = newmap
