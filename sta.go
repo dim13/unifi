@@ -1,5 +1,7 @@
 package unifi
 
+import "log"
+
 type StaMap map[string]Sta
 
 // Station data
@@ -94,13 +96,22 @@ func (s Sta) Name() string {
 }
 
 func (s Sta) Block() {
+	if s.u == nil {
+		log.Fatal("login first")
+	}
 	s.u.maccmd(s.Mac, "block-sta")
 }
 
 func (s Sta) UnBlock() {
+	if s.u == nil {
+		log.Fatal("login first")
+	}
 	s.u.maccmd(s.Mac, "unblock-sta")
 }
 
 func (s Sta) Disconnect() {
+	if s.u == nil {
+		log.Fatal("login first")
+	}
 	s.u.maccmd(s.Mac, "kick-sta")
 }

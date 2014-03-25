@@ -1,5 +1,7 @@
 package unifi
 
+import "log"
+
 type ConfigNetwork struct {
 	Ip   string
 	Type string
@@ -250,5 +252,8 @@ type Aps struct {
 
 // Reboot access point
 func (a Aps) Restart() {
+	if a.u == nil {
+		log.Fatal("login first")
+	}
 	a.u.maccmd(a.Mac, "restart", "devmgr")
 }
