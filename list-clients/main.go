@@ -1,3 +1,4 @@
+// list associated stations
 package main
 
 import (

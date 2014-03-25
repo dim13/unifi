@@ -1,3 +1,4 @@
+// logs stations as they roams
 package main
 
 import (
