@@ -6,12 +6,14 @@ import (
 	"github.com/dim13/unifi"
 )
 
-func main() {
-	user := flag.String("user", "admin", "User")
-	pass := flag.String("pass", "unifi", "Password")
-	url := flag.String("url", "unifi", "URL")
-	flag.Parse()
+var (
+	user = flag.String("user", "admin", "User")
+	pass = flag.String("pass", "unifi", "Password")
+	url  = flag.String("url", "unifi", "URL")
+)
 
+func main() {
+	flag.Parse()
 	u := unifi.Login(*user, *pass, *url)
 	defer u.Logout()
 
