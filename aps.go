@@ -183,6 +183,7 @@ type Stat struct {
 	*/
 }
 
+/* Access point data */
 type Aps struct {
 	Adopted              bool
 	Bytes                int
