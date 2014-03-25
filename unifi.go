@@ -15,8 +15,8 @@ import (
 )
 
 type Unifi struct {
-	Client *http.Client
-	Host   string
+	client *http.Client
+	host   string
 }
 
 type Meta struct {
@@ -39,22 +39,22 @@ func (u *Unifi) Login(user, pass, host string) {
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	cj, _ := cookiejar.New(nil)
-	u.Client = &http.Client{
+	u.client = &http.Client{
 		Transport: tr,
 		Jar:       cj,
 	}
-	u.Host = "https://" + host + ":8443/"
-	if _, err := u.Client.PostForm(u.Host+"login", val); err != nil {
+	u.host = "https://" + host + ":8443/"
+	if _, err := u.client.PostForm(u.host+"login", val); err != nil {
 		log.Fatal(err)
 	}
 }
 
 func (u *Unifi) Logout() {
-	u.Client.Get(u.Host + "logout")
+	u.client.Get(u.host + "logout")
 }
 
 func (u *Unifi) apicmd(cmd string) []byte {
-	resp, err := u.Client.Get(u.Host + "api/" + cmd)
+	resp, err := u.client.Get(u.host + "api/" + cmd)
 	if err != nil {
 		log.Fatal(err)
 	}
