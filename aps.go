@@ -10,7 +10,7 @@ type DownlinkTable struct {
 }
 
 type RadioTable struct {
-	Antenna_gain     int `json:"-"` /* FIXME: buggy input string and int */
+	Antenna_gain     int `json:"-"` /* FIXME: buggy input, sometimes string and sometimes int */
 	Builtin_ant_gain int
 	Builtin_antenna  bool
 	Channel          string
