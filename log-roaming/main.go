@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type Roaming struct {
+type roaming struct {
 	Name    string
 	Ip      string
 	Ap      string
@@ -15,26 +15,30 @@ type Roaming struct {
 	Essid   string
 }
 
-type RoamMap map[string]Roaming
+type roamMap map[string]roaming
+
+var stamap roamMap
+
+var (
+	user = flag.String("user", "admin", "User")
+	pass = flag.String("pass", "unifi", "Password")
+	url = flag.String("url", "unifi", "URL")
+	delay = flag.Int("delay", 5, "delay")
+)
+
+
 
 func main() {
-	var stamap RoamMap
-
-	user := flag.String("user", "admin", "User")
-	pass := flag.String("pass", "unifi", "Password")
-	url := flag.String("url", "unifi", "URL")
-	delay := flag.Int("delay", 5, "delay")
 	flag.Parse()
-
 	u := unifi.Login(*user, *pass, *url)
 	defer u.Logout()
 
 	apsmap := u.ApsMap()
 
 	for {
-		newmap := make(RoamMap)
+		newmap := make(roamMap)
 		for _, s := range u.Sta() {
-			newmap[s.Mac] = Roaming{
+			newmap[s.Mac] = roaming{
 				Name:    s.Name(),
 				Ip:      s.Ip,
 				Ap:      apsmap[s.Ap_mac].Name,
