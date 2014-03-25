@@ -183,6 +183,8 @@ type Stat struct {
 	*/
 }
 
+type ApsMap map[string]Aps
+
 /* Access point data */
 type Aps struct {
 	u                    *Unifi

@@ -1,5 +1,7 @@
 package unifi
 
+type StaMap map[string]Sta
+
 /* Station data */
 type Sta struct {
 	u                  *Unifi

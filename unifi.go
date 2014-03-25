@@ -109,8 +109,8 @@ func (u *Unifi) Aps() []Aps {
 }
 
 /* Returns a map of access points with mac as a key. */
-func (u *Unifi) ApsMap() map[string]Aps {
-	m := make(map[string]Aps)
+func (u *Unifi) ApsMap() ApsMap {
+	m := make(ApsMap)
 	for _, a := range u.Aps() {
 		m[a.Mac] = a
 	}
@@ -131,8 +131,8 @@ func (u *Unifi) Sta() []Sta {
 }
 
 /* Returns a map of stations with MAC as a key. */
-func (u *Unifi) StaMap() map[string]Sta {
-	m := make(map[string]Sta)
+func (u *Unifi) StaMap() StaMap {
+	m := make(StaMap)
 	for _, s := range u.Sta() {
 		m[s.Mac] = s
 	}
