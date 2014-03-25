@@ -19,7 +19,7 @@ type Unifi struct {
 	host   string
 }
 
-type Meta struct {
+type meta struct {
 	Rc string
 }
 
@@ -89,7 +89,7 @@ func (u *Unifi) parse(cmd string, v interface{}) {
 	if err := json.Unmarshal(body, &v); err != nil {
 		log.Fatal(err)
 	}
-	m := reflect.ValueOf(v).Elem().FieldByName("Meta").Interface().(Meta)
+	m := reflect.ValueOf(v).Elem().FieldByName("Meta").Interface().(meta)
 	if m.Rc != "ok" {
 		log.Fatal("not ok")
 	}
@@ -99,7 +99,7 @@ func (u *Unifi) parse(cmd string, v interface{}) {
 func (u *Unifi) GetAps() []Aps {
 	var response struct {
 		Data []Aps
-		Meta Meta
+		Meta meta
 	}
 	u.parse("stat/device", &response)
 	return response.Data
@@ -118,7 +118,7 @@ func (u *Unifi) GetApsMap() map[string]Aps {
 func (u *Unifi) GetSta() []Sta {
 	var response struct {
 		Data []Sta
-		Meta Meta
+		Meta meta
 	}
 	u.parse("stat/sta", &response)
 	return response.Data
@@ -137,7 +137,7 @@ func (u *Unifi) GetStaMap() map[string]Sta {
 func (u *Unifi) GetUsers() []User {
 	var response struct {
 		Data []User
-		Meta Meta
+		Meta meta
 	}
 	u.parse("list/user", &response)
 	return response.Data
@@ -152,7 +152,7 @@ func (u *Unifi) GetUserGroups() {
 func (u *Unifi) GetWlanConf() []WlanConf {
 	var response struct {
 		Data []WlanConf
-		Meta Meta
+		Meta meta
 	}
 	u.parse("list/wlanconf", &response)
 	return response.Data

@@ -1,6 +1,7 @@
 package unifi
 
 type Sta struct {
+	Unifi
 	Ap_mac             string
 	Assoc_time         int //Timestamp
 	Auth_time          int //Timestamp
