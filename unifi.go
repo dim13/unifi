@@ -23,13 +23,14 @@ type Meta struct {
 	Rc string
 }
 
+/* Initializes a session. */
 func Login(user, pass, host string) *Unifi {
 	u := new(Unifi)
-	u.Login(user, pass, host)
+	u.login(user, pass, host)
 	return u
 }
 
-func (u *Unifi) Login(user, pass, host string) {
+func (u *Unifi) login(user, pass, host string) {
 	val := url.Values{
 		"login":    {"login"},
 		"username": {user},
@@ -49,6 +50,7 @@ func (u *Unifi) Login(user, pass, host string) {
 	}
 }
 
+/* Terminates a session. */
 func (u *Unifi) Logout() {
 	u.client.Get(u.host + "logout")
 }
@@ -93,6 +95,7 @@ func (u *Unifi) parse(cmd string, v interface{}) {
 	}
 }
 
+/* Returns a slice of access points. */
 func (u *Unifi) GetAps() []Aps {
 	var response struct {
 		Data []Aps
@@ -102,6 +105,7 @@ func (u *Unifi) GetAps() []Aps {
 	return response.Data
 }
 
+/* Returns a map of access points with mac as a key. */
 func (u *Unifi) GetApsMap() map[string]Aps {
 	m := make(map[string]Aps)
 	for _, a := range u.GetAps() {
@@ -110,6 +114,7 @@ func (u *Unifi) GetApsMap() map[string]Aps {
 	return m
 }
 
+/* Returns a slice of stations. */
 func (u *Unifi) GetSta() []Sta {
 	var response struct {
 		Data []Sta
@@ -119,6 +124,7 @@ func (u *Unifi) GetSta() []Sta {
 	return response.Data
 }
 
+/* Returns a map of stations with MAC as a key. */
 func (u *Unifi) GetStaMap() map[string]Sta {
 	m := make(map[string]Sta)
 	for _, s := range u.GetSta() {
@@ -127,6 +133,7 @@ func (u *Unifi) GetStaMap() map[string]Sta {
 	return m
 }
 
+/* Returns a slice of known users. */
 func (u *Unifi) GetUsers() []User {
 	var response struct {
 		Data []User
@@ -141,6 +148,7 @@ func (u *Unifi) GetUserGroups() {
 	fmt.Printf("%s\n", body)
 }
 
+/* Returns a Wlan config. */
 func (u *Unifi) GetWlanConf() []WlanConf {
 	var response struct {
 		Data []WlanConf
