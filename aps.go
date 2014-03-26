@@ -285,7 +285,7 @@ var status = map[int]string{
 	0:  "Disconnected",
 	1:  "Connected",
 	2:  "Pending",
-	3:  "Connected",
+	3:  "Disconnected",
 	4:  "Upgrading",
 	5:  "Provisioning",
 	6:  "HeartbeatMissed",
