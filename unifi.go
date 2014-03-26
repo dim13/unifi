@@ -68,20 +68,27 @@ func (u *Unifi) apicmd(cmd string) []byte {
 	return body
 }
 
-func (u *Unifi) maccmd(mac, cmd string, mgr ...string) {
-	type Command struct {
-		Mac string
-		Cmd string
+func (u *Unifi) devcmd(mac, cmd string) {
+	u.maccmd(mac, cmd, "devmgr")
+}
+
+func (u *Unifi) stacmd(mac, cmd string) {
+	u.maccmd(mac, cmd, "stamgr")
+}
+
+func (u *Unifi) maccmd(mac, cmd, mgr string) {
+	type command struct {
+		Mac string `json:"mac"`
+		Cmd string `json:"cmd"`
 	}
-	if mgr == nil {
-		mgr = append(mgr, "stamgr")
-	}
-	res, err := json.Marshal(Command{Mac: mac, Cmd: cmd})
+	param, err := json.Marshal(command{Mac: mac, Cmd: cmd})
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%s: %s %s\n", u.host, res, mgr[0])
-	/* FIXME */
+	val := url.Values{"json": {string(param)}}
+	if _, err := u.client.PostForm(u.host+"api/cmd/"+mgr, val); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (u *Unifi) parse(cmd string, v interface{}) {
@@ -91,7 +98,7 @@ func (u *Unifi) parse(cmd string, v interface{}) {
 	}
 	m := reflect.ValueOf(v).Elem().FieldByName("Meta").Interface().(meta)
 	if m.Rc != "ok" {
-		log.Fatal("not ok")
+		log.Fatal(m.Rc)
 	}
 }
 

@@ -99,19 +99,19 @@ func (s Sta) Block() {
 	if s.u == nil {
 		log.Fatal("login first")
 	}
-	s.u.maccmd(s.Mac, "block-sta")
+	s.u.stacmd(s.Mac, "block-sta")
 }
 
 func (s Sta) UnBlock() {
 	if s.u == nil {
 		log.Fatal("login first")
 	}
-	s.u.maccmd(s.Mac, "unblock-sta")
+	s.u.stacmd(s.Mac, "unblock-sta")
 }
 
 func (s Sta) Disconnect() {
 	if s.u == nil {
 		log.Fatal("login first")
 	}
-	s.u.maccmd(s.Mac, "kick-sta")
+	s.u.stacmd(s.Mac, "kick-sta")
 }

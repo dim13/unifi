@@ -255,5 +255,28 @@ func (a Aps) Restart() {
 	if a.u == nil {
 		log.Fatal("login first")
 	}
-	a.u.maccmd(a.Mac, "restart", "devmgr")
+	a.u.devcmd(a.Mac, "restart")
+}
+
+var model = map[string]string{
+	"BZ2": "UniFi AP",
+	"BZ2LR": "UniFi AP-LR",
+	"U2S48": "UniFi AP",
+	"U2L48": "UniFi AP-LR",
+	"U2HSR": "UniFi AP-Outdoor+",
+	"U2O": "UniFi AP-Outdoor",
+	"U5O": "UniFi AP-Outdoor 5G",
+	"U7P": "UniFi AP-Pro",
+	"U2M": "UniFi AP-Mini",
+	"p2N": "PicoStation M2",
+	"U7E": "UniFi AP-AC",
+	"U7O": "UniFi AP-AC Outdoor",
+	"U7Ev2": "UniFi AP-AC v2",
+}
+
+func (a Aps) ModelName() string {
+	if m, ok := model[a.Model]; ok {
+		return m
+	}
+	return "unknown"
 }
