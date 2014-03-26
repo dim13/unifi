@@ -5,7 +5,6 @@ package unifi
 import (
 	"crypto/tls"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -156,9 +155,14 @@ func (u *Unifi) Users() []User {
 	return response.Data
 }
 
-func (u *Unifi) UserGroups() {
-	body := u.apicmd("list/usergroup")
-	fmt.Printf("%s\n", body)
+// Returns user groups
+func (u *Unifi) UserGroups() []UserGroup {
+	var response struct {
+		Data []UserGroup
+		Meta meta
+	}
+	u.parse("list/usergroup", &response)
+	return response.Data
 }
 
 // Returns a Wlan config
