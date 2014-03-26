@@ -19,6 +19,6 @@ func main() {
 	defer u.Logout()
 
 	for _, s := range u.Aps() {
-		fmt.Println(s.Mac, s.ModelName(), s.Name)
+		fmt.Println(s.Mac, s.ModelName(), s.Name, s.Status())
 	}
 }

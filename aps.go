@@ -259,24 +259,48 @@ func (a Aps) Restart() {
 }
 
 var model = map[string]string{
-	"BZ2": "UniFi AP",
+	"BZ2":   "UniFi AP",
 	"BZ2LR": "UniFi AP-LR",
 	"U2S48": "UniFi AP",
 	"U2L48": "UniFi AP-LR",
 	"U2HSR": "UniFi AP-Outdoor+",
-	"U2O": "UniFi AP-Outdoor",
-	"U5O": "UniFi AP-Outdoor 5G",
-	"U7P": "UniFi AP-Pro",
-	"U2M": "UniFi AP-Mini",
-	"p2N": "PicoStation M2",
-	"U7E": "UniFi AP-AC",
-	"U7O": "UniFi AP-AC Outdoor",
+	"U2O":   "UniFi AP-Outdoor",
+	"U5O":   "UniFi AP-Outdoor 5G",
+	"U7P":   "UniFi AP-Pro",
+	"U2M":   "UniFi AP-Mini",
+	"p2N":   "PicoStation M2",
+	"U7E":   "UniFi AP-AC",
+	"U7O":   "UniFi AP-AC Outdoor",
 	"U7Ev2": "UniFi AP-AC v2",
 }
 
 func (a Aps) ModelName() string {
 	if m, ok := model[a.Model]; ok {
 		return m
+	}
+	return "unknown"
+}
+
+var status = map[int]string{
+	0:  "Disconnected",
+	1:  "Connected",
+	2:  "Pending",
+	3:  "Connected",
+	4:  "Upgrading",
+	5:  "Provisioning",
+	6:  "HeartbeatMissed",
+	7:  "Adoping",
+	8:  "Deleting",
+	9:  "ManagedByOthers",
+	10: "AdoptFailed",
+	11: "Isolated",
+	12: "IsolatePending",
+	13: "WirelessAdopting",
+}
+
+func (a Aps) Status() string {
+	if s, ok := status[a.State]; ok {
+		return s
 	}
 	return "unknown"
 }
