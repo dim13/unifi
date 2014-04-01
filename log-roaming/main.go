@@ -5,6 +5,8 @@ import (
 	"flag"
 	"github.com/dim13/unifi"
 	"log"
+	"log/syslog"
+	"os"
 	"time"
 )
 
@@ -31,8 +33,14 @@ func main() {
 	flag.Parse()
 	u := unifi.Login(*user, *pass, *url)
 	defer u.Logout()
-
 	apsmap := u.ApsMap()
+
+	elog := log.New(os.Stderr, "", log.Ltime)
+	slog, err := syslog.NewLogger(syslog.LOG_NOTICE|syslog.LOG_DAEMON, 0)
+	if err != nil {
+		log.Fatal(err)
+	}
+	logger := []*log.Logger{elog, slog}
 
 	for {
 		newmap := make(roamMap)
@@ -47,19 +55,28 @@ func main() {
 		}
 		for k, v := range newmap {
 			if z, ok := stamap[k]; !ok {
-				log.Printf("→ %s appears on %s/%d (%s/%s)\n",
-					v.Name, v.Ap, v.Channel, v.Essid, v.Ip)
+				elog.SetPrefix(" → ")
+				for _, l := range logger {
+					l.Printf("%s appears on %s/%d %s/%s\n",
+						v.Name, v.Ap, v.Channel, v.Essid, v.Ip)
+				}
 			} else if z != v {
-				log.Printf("↔ %s roams %s/%d (%s/%s) → %s/%d (%s/%s)\n",
-					v.Name,
-					z.Ap, z.Channel, z.Essid, z.Ip,
-					v.Ap, v.Channel, v.Essid, v.Ip)
+				elog.SetPrefix(" ↔ ")
+				for _, l := range logger {
+					l.Printf("%s roams from %s/%d %s/%s to %s/%d %s/%s\n",
+						v.Name,
+						z.Ap, z.Channel, z.Essid, z.Ip,
+						v.Ap, v.Channel, v.Essid, v.Ip)
+				}
 			}
 			delete(stamap, k)
 		}
 		for _, v := range stamap {
-			log.Printf("← %s vanishes from %s/%d (%s/%s)\n",
-				v.Name, v.Ap, v.Channel, v.Essid, v.Ip)
+			elog.SetPrefix(" ← ")
+			for _, l := range logger {
+				l.Printf("%s vanishes from %s/%d %s/%s\n",
+					v.Name, v.Ap, v.Channel, v.Essid, v.Ip)
+			}
 		}
 		stamap = newmap
 		time.Sleep(time.Duration(*delay) * time.Second)
