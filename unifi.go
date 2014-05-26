@@ -93,6 +93,8 @@ func (u *Unifi) maccmd(mac, cmd, mgr string) {
 func (u *Unifi) parse(cmd string, v interface{}) {
 	body := u.apicmd(cmd)
 	if err := json.Unmarshal(body, &v); err != nil {
+		log.Println(cmd)
+		log.Println(string(body))
 		log.Fatal(err)
 	}
 	m := reflect.ValueOf(v).Elem().FieldByName("Meta").Interface().(meta)

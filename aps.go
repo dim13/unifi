@@ -243,11 +243,11 @@ type Aps struct {
 	Version              string
 	VwireEnabled         bool
 	Vwire_table          []VwireTable
-	X                    int
+	X                    float64
 	X_authkey            string
 	X_fingerprint        string
 	X_vwirekey           string
-	Y                    int
+	Y                    float64
 }
 
 // Reboot access point
