@@ -23,17 +23,26 @@ type roamMap map[string]roaming
 var stamap roamMap
 
 var (
-	user  = flag.String("user", "admin", "User")
-	pass  = flag.String("pass", "unifi", "Password")
-	url   = flag.String("url", "unifi", "URL")
-	delay = flag.Int("delay", 5, "delay")
+	host    = flag.String("host", "unifi", "Controller hostname")
+	user    = flag.String("user", "admin", "Controller username")
+	pass    = flag.String("pass", "unifi", "Controller password")
+	version = flag.Int("version", 2, "Controller base version")
+	siteid  = flag.String("siteid", "default", "Site ID, UniFi v3 only")
+	delay   = flag.Duration("delay", 5*time.Second, "delay")
 )
 
 func main() {
 	flag.Parse()
-	u := unifi.Login(*user, *pass, *url)
+	u, err := unifi.Login(*user, *pass, *host, *siteid, *version)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	defer u.Logout()
-	apsmap := u.ApsMap()
+	apsmap, err := u.ApsMap()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	elog := log.New(os.Stderr, "", log.Ltime)
 	slog, err := syslog.NewLogger(syslog.LOG_NOTICE|syslog.LOG_DAEMON, 0)
@@ -43,8 +52,13 @@ func main() {
 	logger := []*log.Logger{elog, slog}
 
 	for {
+		time.Sleep(*delay)
 		newmap := make(roamMap)
-		for _, s := range u.Sta() {
+		sta, err := u.Sta()
+		if err != nil {
+			continue
+		}
+		for _, s := range sta {
 			newmap[s.Mac] = roaming{
 				Name:    s.Name(),
 				Ip:      s.Ip,
@@ -79,6 +93,5 @@ func main() {
 			}
 		}
 		stamap = newmap
-		time.Sleep(time.Duration(*delay) * time.Second)
 	}
 }
