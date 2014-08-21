@@ -12,7 +12,7 @@ import (
 
 type roaming struct {
 	Name    string
-	Ip      string
+	IP      string
 	Ap      string
 	Channel int
 	Essid   string
@@ -61,7 +61,7 @@ func main() {
 		for _, s := range sta {
 			newmap[s.Mac] = roaming{
 				Name:    s.Name(),
-				Ip:      s.Ip,
+				IP:      s.IP,
 				Ap:      apsmap[s.Ap_mac].Name,
 				Channel: s.Channel,
 				Essid:   s.Essid,
@@ -72,15 +72,15 @@ func main() {
 				elog.SetPrefix(" → ")
 				for _, l := range logger {
 					l.Printf("%s appears on %s/%d %s/%s\n",
-						v.Name, v.Ap, v.Channel, v.Essid, v.Ip)
+						v.Name, v.Ap, v.Channel, v.Essid, v.IP)
 				}
 			} else if z != v {
 				elog.SetPrefix(" ↔ ")
 				for _, l := range logger {
 					l.Printf("%s roams from %s/%d %s/%s to %s/%d %s/%s\n",
 						v.Name,
-						z.Ap, z.Channel, z.Essid, z.Ip,
-						v.Ap, v.Channel, v.Essid, v.Ip)
+						z.Ap, z.Channel, z.Essid, z.IP,
+						v.Ap, v.Channel, v.Essid, v.IP)
 				}
 			}
 			delete(stamap, k)
@@ -89,7 +89,7 @@ func main() {
 			elog.SetPrefix(" ← ")
 			for _, l := range logger {
 				l.Printf("%s vanishes from %s/%d %s/%s\n",
-					v.Name, v.Ap, v.Channel, v.Essid, v.Ip)
+					v.Name, v.Ap, v.Channel, v.Essid, v.IP)
 			}
 		}
 		stamap = newmap

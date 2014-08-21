@@ -1,10 +1,10 @@
 package unifi
 
 type User struct {
-	First_seen int
-	Hostname   string
-	Is_guest   bool
-	Last_seen  int
-	Mac        string
-	Oui        string
+	FirstSeen int `json:"first_seen"`
+	Hostname  string
+	IsGuest   bool `json:"is_guest"`
+	LastSeen  int  `json:"last_seen"`
+	Mac       string
+	Oui       string
 }
