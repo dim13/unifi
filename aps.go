@@ -1,7 +1,5 @@
 package unifi
 
-import "log"
-
 type ConfigNetwork struct {
 	Ip   string
 	Type string
@@ -251,11 +249,11 @@ type Aps struct {
 }
 
 // Reboot access point
-func (a Aps) Restart() {
+func (a Aps) Restart() error {
 	if a.u == nil {
-		log.Fatal("login first")
+		return ErrLoginFirst
 	}
-	a.u.devcmd(a.Mac, "restart")
+	return a.u.devcmd(a.Mac, "restart", 0)
 }
 
 var model = map[string]string{

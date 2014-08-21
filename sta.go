@@ -1,7 +1,5 @@
 package unifi
 
-import "log"
-
 type StaMap map[string]Sta
 
 // Station data
@@ -95,23 +93,30 @@ func (s Sta) Name() string {
 	return s.Mac
 }
 
-func (s Sta) Block() {
+func (s Sta) Block() error {
 	if s.u == nil {
-		log.Fatal("login first")
+		return ErrLoginFirst
 	}
-	s.u.stacmd(s.Mac, "block-sta")
+	return s.u.stacmd(s.Mac, "block-sta")
 }
 
-func (s Sta) UnBlock() {
+func (s Sta) UnBlock() error {
 	if s.u == nil {
-		log.Fatal("login first")
+		return ErrLoginFirst
 	}
-	s.u.stacmd(s.Mac, "unblock-sta")
+	return s.u.stacmd(s.Mac, "unblock-sta")
 }
 
-func (s Sta) Disconnect() {
+func (s Sta) Disconnect() error {
 	if s.u == nil {
-		log.Fatal("login first")
+		return ErrLoginFirst
 	}
-	s.u.stacmd(s.Mac, "kick-sta")
+	return s.u.stacmd(s.Mac, "kick-sta")
+}
+
+func (s Sta) AuthorizeGuest(minutes int) error {
+	if s.u == nil {
+		return ErrLoginFirst
+	}
+	return s.u.devcmd(s.Mac, "authorize-guest", minutes)
 }

@@ -5,6 +5,7 @@ package unifi
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -12,6 +13,10 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"reflect"
+)
+
+var (
+	ErrLoginFirst = errors.New("login first")
 )
 
 type Unifi struct {
@@ -78,20 +83,22 @@ func (u *Unifi) apicmd(cmd string) ([]byte, error) {
 	return body, nil
 }
 
-func (u *Unifi) devcmd(mac, cmd string) error {
-	return u.maccmd(mac, cmd, "devmgr")
+type command struct {
+	Mac     string `json:"mac"`
+	Cmd     string `json:"cmd"`
+	Minutes int    `json:"minutes,omitempty"`
+}
+
+func (u *Unifi) devcmd(mac, cmd string, minutes int) error {
+	return u.maccmd("devmgr", command{Mac: mac, Cmd: cmd, Minutes: minutes})
 }
 
 func (u *Unifi) stacmd(mac, cmd string) error {
-	return u.maccmd(mac, cmd, "stamgr")
+	return u.maccmd("stamgr", command{Mac: mac, Cmd: cmd})
 }
 
-func (u *Unifi) maccmd(mac, cmd, mgr string) error {
-	type command struct {
-		Mac string `json:"mac"`
-		Cmd string `json:"cmd"`
-	}
-	param, err := json.Marshal(command{Mac: mac, Cmd: cmd})
+func (u *Unifi) maccmd(mgr string, args interface{}) error {
+	param, err := json.Marshal(args)
 	if err != nil {
 		return err
 	}
