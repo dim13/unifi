@@ -62,9 +62,9 @@ func main() {
 			newmap[s.Mac] = roaming{
 				Name:    s.Name(),
 				IP:      s.IP,
-				Ap:      apsmap[s.Ap_mac].Name,
+				Ap:      apsmap[s.ApMac].Name,
 				Channel: s.Channel,
-				Essid:   s.Essid,
+				Essid:   s.EssID,
 			}
 		}
 		for k, v := range newmap {
