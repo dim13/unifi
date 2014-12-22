@@ -35,7 +35,7 @@ func main() {
 
 	for _, s := range sta {
 		fmt.Printf("%24s%3s%12s%3d%5d%5d%5d%8s/%-3d%16s%4s\n",
-			s.Name(), s.Radio, s.Essid, s.Roam_count, s.Signal, s.Noise, s.Rssi,
-			aps[s.Ap_mac].Name, s.Channel, s.Ip, aps[s.Ap_mac].Model)
+			s.Name(), s.Radio, s.EssID, s.RoamCount, s.Signal, s.Noise, s.Rssi,
+			aps[s.ApMac].Name, s.Channel, s.IP, aps[s.ApMac].Model)
 	}
 }
