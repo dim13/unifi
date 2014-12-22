@@ -32,14 +32,6 @@ type meta struct {
 // Initializes a session.  If site != "", it's to a V3 controller.
 func Login(user, pass, host, site string, version int) (*Unifi, error) {
 	u := new(Unifi)
-	err := u.login(user, pass, host, site, version)
-	if err != nil {
-		return nil, err
-	}
-	return u, nil
-}
-
-func (u *Unifi) login(user, pass, host, site string, version int) error {
 	val := url.Values{
 		"login":    {"login"},
 		"username": {user},
@@ -55,14 +47,14 @@ func (u *Unifi) login(user, pass, host, site string, version int) error {
 	}
 	u.baseURL = "https://" + host + ":8443/"
 	if _, err := u.client.PostForm(u.baseURL+"login", val); err != nil {
-		return err
+		return nil, err
 	}
 	if version >= 3 {
 		u.apiURL = u.baseURL + "api/s/" + site + "/"
 	} else {
 		u.apiURL = u.baseURL + "api/"
 	}
-	return nil
+	return u, nil
 }
 
 // Terminates a session
