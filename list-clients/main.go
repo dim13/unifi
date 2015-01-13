@@ -5,6 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
+	"text/tabwriter"
 
 	"github.com/dim13/unifi"
 )
@@ -18,6 +20,10 @@ var (
 )
 
 func main() {
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 3, ' ', 0)
+	defer w.Flush()
+
 	flag.Parse()
 	u, err := unifi.Login(*user, *pass, *host, *siteid, *version)
 	if err != nil {
@@ -35,7 +41,7 @@ func main() {
 	}
 
 	for _, s := range sta {
-		fmt.Printf("%24s%3s%12s%3d%5d%5d%5d%8s/%-3d%16s%4s\n",
+		fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s/%d\t%s\t%s\n",
 			s.Name(), s.Radio, s.EssID, s.RoamCount, s.Signal, s.Noise, s.Rssi,
 			aps[s.ApMac].Name, s.Channel, s.IP, aps[s.ApMac].Model)
 	}
