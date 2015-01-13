@@ -286,14 +286,14 @@ var status = map[int]string{
 	3:  "Disconnected",
 	4:  "Upgrading",
 	5:  "Provisioning",
-	6:  "HeartbeatMissed",
+	6:  "Heartbeat Missed",
 	7:  "Adoping",
 	8:  "Deleting",
-	9:  "ManagedByOthers",
-	10: "AdoptFailed",
+	9:  "Managed By Others",
+	10: "Adopt Failed",
 	11: "Isolated",
-	12: "IsolatePending",
-	13: "WirelessAdopting",
+	12: "Isolate Pending",
+	13: "Wireless Adopting",
 }
 
 func (a Aps) Status() string {
