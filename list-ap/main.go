@@ -4,8 +4,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/dim13/unifi"
 	"log"
+	"os"
+	"text/tabwriter"
+
+	"github.com/dim13/unifi"
 )
 
 var (
@@ -17,13 +20,18 @@ var (
 )
 
 func main() {
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 3, ' ', 0)
+	defer w.Flush()
+
 	flag.Parse()
+
 	u, err := unifi.Login(*user, *pass, *host, *siteid, *version)
 	if err != nil {
 		log.Fatalln("Login returned error: ", err)
 	}
-
 	defer u.Logout()
+
 
 	aps, err := u.Aps()
 	if err != nil {
@@ -31,6 +39,6 @@ func main() {
 	}
 
 	for _, s := range aps {
-		fmt.Println(s.Mac, s.ModelName(), s.Name, s.Status())
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", s.Mac, s.ModelName(), s.Name, s.Status())
 	}
 }
