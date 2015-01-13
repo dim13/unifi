@@ -32,13 +32,13 @@ func main() {
 	}
 	defer u.Logout()
 
-
 	aps, err := u.Aps()
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	for _, s := range aps {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", s.Mac, s.ModelName(), s.Name, s.Status())
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n",
+			s.Mac, s.ModelName(), s.Version, s.Name, s.Status())
 	}
 }
