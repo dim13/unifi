@@ -4,8 +4,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/dim13/unifi"
 	"log"
+
+	"github.com/dim13/unifi"
 )
 
 var (
