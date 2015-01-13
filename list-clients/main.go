@@ -41,7 +41,7 @@ func main() {
 	}
 
 	for _, s := range sta {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s/%d\t%s\t%s\n",
+		fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%s\t%s\n",
 			s.Name(), s.Radio, s.EssID, s.RoamCount, s.Signal, s.Noise, s.Rssi,
 			aps[s.ApMac].Name, s.Channel, s.IP, aps[s.ApMac].Model)
 	}
