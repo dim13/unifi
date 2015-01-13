@@ -3,11 +3,12 @@ package main
 
 import (
 	"flag"
-	"github.com/dim13/unifi"
 	"log"
 	"log/syslog"
 	"os"
 	"time"
+
+	"github.com/dim13/unifi"
 )
 
 type roaming struct {
