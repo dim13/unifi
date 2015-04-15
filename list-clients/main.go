@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/dim13/unifi"
@@ -41,8 +43,20 @@ func main() {
 	}
 
 	for _, s := range sta {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%d\t%d\t%d\t%s\t%d\t%s\t%s\n",
-			s.Name(), s.Radio, s.EssID, s.RoamCount, s.Signal, s.Noise, s.Rssi,
-			aps[s.ApMac].Name, s.Channel, s.IP, aps[s.ApMac].Model)
+		a := aps[s.ApMac]
+		p := []string{
+			s.Name(),
+			s.Radio,
+			strconv.Itoa(s.Channel),
+			s.EssID,
+			strconv.Itoa(s.RoamCount),
+			strconv.Itoa(s.Signal),
+			strconv.Itoa(s.Noise),
+			strconv.Itoa(s.Rssi),
+			a.Name,
+			s.IP,
+			a.ModelName(),
+		}
+		fmt.Fprintln(w, strings.Join(p, "\t"))
 	}
 }
