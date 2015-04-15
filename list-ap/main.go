@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/dim13/unifi"
@@ -38,7 +39,14 @@ func main() {
 	}
 
 	for _, s := range aps {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n",
-			s.Mac, s.ModelName(), s.Version, s.Name, s.Status())
+		p := []string{
+			s.Name,
+			s.IP,
+			s.Mac,
+			s.ModelName(),
+			s.Version,
+			s.Status(),
+		}
+		fmt.Fprintln(w, strings.Join(p, "\t"))
 	}
 }
