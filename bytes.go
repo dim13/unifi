@@ -11,5 +11,5 @@ func (b Bytes) String() string {
 		b /= 1024
 		i++
 	}
-	return fmt.Sprintf("%5.1f %sB", b, string(dim[i]))
+	return fmt.Sprintf("%6.1f %sB", b, string(dim[i]))
 }
