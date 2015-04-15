@@ -48,6 +48,8 @@ func main() {
 			s.Version,
 			s.Status(),
 			strconv.Itoa(s.NumSta),
+			unifi.Bytes(s.TxBytes).String(),
+			unifi.Bytes(s.RxBytes).String(),
 		}
 		fmt.Fprintln(w, strings.Join(p, "\t"))
 	}
