@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"text/tabwriter"
 
@@ -46,6 +47,7 @@ func main() {
 			s.ModelName(),
 			s.Version,
 			s.Status(),
+			strconv.Itoa(s.NumSta),
 		}
 		fmt.Fprintln(w, strings.Join(p, "\t"))
 	}
