@@ -118,5 +118,12 @@ func (s Sta) AuthorizeGuest(minutes int) error {
 	if s.u == nil {
 		return ErrLoginFirst
 	}
-	return s.u.devcmd(s.Mac, "authorize-guest", minutes)
+	return s.u.stacmd(s.Mac, "authorize-guest", minutes)
+}
+
+func (s Sta) UnauthorizeGuest() error {
+	if s.u == nil {
+		return ErrLoginFirst
+	}
+	return s.u.stacmd(s.Mac, "unauthorize-guest")
 }
