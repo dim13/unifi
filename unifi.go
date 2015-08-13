@@ -3,6 +3,7 @@
 package unifi
 
 import (
+	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"errors"
@@ -23,20 +24,21 @@ type Unifi struct {
 	client  *http.Client
 	baseURL string
 	apiURL  string
+	version int
 }
 
 type meta struct {
 	Rc string
 }
 
+type login struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 // Initializes a session.  If site != "", it's to a V3 controller.
 func Login(user, pass, host, site string, version int) (*Unifi, error) {
 	u := new(Unifi)
-	val := url.Values{
-		"login":    {"login"},
-		"username": {user},
-		"password": {pass},
-	}
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
@@ -46,10 +48,32 @@ func Login(user, pass, host, site string, version int) (*Unifi, error) {
 		Jar:       cj,
 	}
 	u.baseURL = "https://" + host + ":8443/"
-	if _, err := u.client.PostForm(u.baseURL+"login", val); err != nil {
-		return nil, err
+	u.version = version
+	if u.version >= 4 {
+		l := new(login)
+		l.Username = user
+		l.Password = pass
+		j, err := json.Marshal(l)
+		if err != nil {
+			return nil, err
+		}
+		r := bytes.NewReader(j)
+		if _, err := u.client.Post(u.baseURL+"api/login", "application/json", r); err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+	} else {
+		val := url.Values{
+			"login":    {"login"},
+			"username": {user},
+			"password": {pass},
+		}
+		if _, err := u.client.PostForm(u.baseURL+"login", val); err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
 	}
-	if version >= 3 {
+	if u.version >= 3 {
 		u.apiURL = u.baseURL + "api/s/" + site + "/"
 	} else {
 		u.apiURL = u.baseURL + "api/"
@@ -81,12 +105,16 @@ type command struct {
 	Minutes int    `json:"minutes,omitempty"`
 }
 
-func (u *Unifi) devcmd(mac, cmd string, minutes int) error {
-	return u.maccmd("devmgr", command{Mac: mac, Cmd: cmd, Minutes: minutes})
+func (u *Unifi) devcmd(mac, cmd string) error {
+	return u.maccmd("devmgr", command{Mac: mac, Cmd: cmd})
 }
 
-func (u *Unifi) stacmd(mac, cmd string) error {
-	return u.maccmd("stamgr", command{Mac: mac, Cmd: cmd})
+func (u *Unifi) stacmd(mac, cmd string, min ...int) error {
+	minutes := 0
+	if len(min) > 0 {
+		minutes = min[0]
+	}
+	return u.maccmd("stamgr", command{Mac: mac, Cmd: cmd, Minutes: minutes})
 }
 
 func (u *Unifi) maccmd(mgr string, args interface{}) error {

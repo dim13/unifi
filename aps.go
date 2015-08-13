@@ -253,7 +253,7 @@ func (a Aps) Restart() error {
 	if a.u == nil {
 		return ErrLoginFirst
 	}
-	return a.u.devcmd(a.Mac, "restart", 0)
+	return a.u.devcmd(a.Mac, "restart")
 }
 
 var model = map[string]string{
