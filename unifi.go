@@ -1,4 +1,6 @@
-// in memory of http://memegenerator.net/instance/37313316 and https://xkcd.com/927/
+// Copyright (c) 2014 Dimitri Sokolyuk. All rights reserved.
+// Use of this source code is governed by ISC-style license
+// that can be found in the LICENSE file.
 
 package unifi
 
