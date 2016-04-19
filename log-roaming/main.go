@@ -56,8 +56,9 @@ func main() {
 	}
 	logger := []*log.Logger{elog, slog}
 
-	for {
-		time.Sleep(*delay)
+	ticker := time.NewTicker(*delay)
+	defer ticker.Stop()
+	for range ticker.C {
 		newmap := make(roamMap)
 		sta, err := u.Sta()
 		if err != nil {
