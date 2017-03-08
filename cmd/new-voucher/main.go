@@ -8,7 +8,8 @@ import (
 	"log"
 	"os"
 	"text/tabwriter"
-	"unifi"
+
+	"github.com/dim13/unifi"
 )
 
 var (

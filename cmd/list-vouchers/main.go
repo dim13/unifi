@@ -10,7 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"text/tabwriter"
-	"unifi"
+
+	"github.com/dim13/unifi"
 )
 
 var (
