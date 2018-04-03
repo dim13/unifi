@@ -2,7 +2,7 @@
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// list associated stations
+// list devices
 package main
 
 import (
@@ -11,7 +11,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"strings"
 	"text/tabwriter"
 
 	"github.com/BFLB/unifi"
@@ -21,8 +20,8 @@ var (
 	host    = flag.String("host", "unifi", "Controller hostname")
 	user    = flag.String("user", "admin", "Controller username")
 	pass    = flag.String("pass", "unifi", "Controller password")
-	version = flag.Int("version", 5, "Controller base version")
 	port    = flag.String("port", "8443", "Controller port")
+	version = flag.Int("version", 5, "Controller base version")
 	siteid  = flag.String("siteid", "default", "Site ID, UniFi v3 only")
 )
 
@@ -36,31 +35,31 @@ func main() {
 	u, err := unifi.Login(*user, *pass, *host, *port, *siteid, *version)
 	if err != nil {
 		log.Fatalln("Login returned error: ", err)
-		return
 	}
 	defer u.Logout()
 
-	aps, err := u.Aps()
+	// Returns a slice of devices
+	networks, err := u.Networks()
+
 	if err != nil {
 		log.Fatalln(err)
-		return
 	}
 
 	// Output headline
-	fmt.Fprintln(w, "DeviceName\tIP\tMac\tModelName\tVersion\tStatus\tNumberOfClients\tTxBytes\tRxBytes")
+	fmt.Fprintln(w, "ID\tName\tSiteID\tPurpose\tSubnet\tNetworkgroup\tDomainname\tAttrHiddenId\tAttrNoDelete\tVlanEnabled")
 
-	for _, s := range aps {
-		p := []string{
-			s.DeviceName(), // Serial if not specified
-			s.IP,
-			s.Mac,
-			s.ModelName(),
-			s.Version,
-			s.Status(),
-			strconv.Itoa(s.NumSta),
-			strings.TrimSpace(unifi.Bytes(s.TxBytes).String()),
-			strings.TrimSpace(unifi.Bytes(s.RxBytes).String()),
-		}
-		fmt.Fprintln(w, strings.Join(p, "\t"))
+	for _, n := range networks {
+		id := n.ID           // string
+		name := n.Name       // string
+		siteid := n.SiteID   // string
+		purpose := n.Purpose // string
+		subnet := n.IPSubnet
+		networkgroup := n.Networkgroup // string
+		domaninname := n.DomainName    // string
+		attrhiddenid := n.AttrHiddenID //string
+		attrnodelete := n.AttrNoDelete // bool
+		vlanenabled := n.VlanEnabled   // bool
+
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", id, name, siteid, purpose, subnet, networkgroup, domaninname, attrhiddenid, strconv.FormatBool(attrnodelete), strconv.FormatBool(vlanenabled))
 	}
 }

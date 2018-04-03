@@ -18,9 +18,12 @@ var (
 	minute = flag.String("minute", "1440", "Duration of the voucher in minutes")
 	note   = flag.String("note", "", "Note of the voucher")
 
-	host = flag.String("host", "unifi", "Controller hostname")
-	user = flag.String("user", "admin", "Controller username")
-	pass = flag.String("pass", "unifi", "Controller password")
+	host    = flag.String("host", "unifi", "Controller hostname")
+	user    = flag.String("user", "admin", "Controller username")
+	pass    = flag.String("pass", "unifi", "Controller password")
+	version = flag.Int("version", 5, "Controller base version")
+	port    = flag.String("port", "8443", "Controller port")
+	siteid  = flag.String("siteid", "default", "Site ID, UniFi v3 only")
 )
 
 func main() {
@@ -34,7 +37,7 @@ func main() {
 	*version = 4
 	*siteid = "default"
 
-	u, err := unifi.Login(*user, *pass, *host, *siteid, *version)
+	u, err := unifi.Login(*user, *pass, *host, *port, *siteid, *version)
 	if err != nil {
 		log.Fatal("Login returned error: ", err)
 	}
