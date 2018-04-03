@@ -123,8 +123,7 @@ func (u *Unifi) apicmdPut(cmd string, data interface{}) error {
 	if err != nil {
 		return err
 	}
-	//fmt.Printf("%+v\n", j)
-	fmt.Println(string(j))
+
 	r := bytes.NewReader(j)
 
 	req, err := http.NewRequest(http.MethodPut, url, r)
