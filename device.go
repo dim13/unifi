@@ -190,12 +190,15 @@ type EthernetTable struct {
 }
 
 const (
-	OPMODE_SWITCH    = "switch" // FIXME
-	OPMODE_AGGREGATE = "aggregate"
-	OPMODE_MIRROR    = "mirror"
-	POEMODE_AUTO     = "auto"
-	POEMODE_OFF      = "off"
-	POEMODE_PASV24   = "pasv24"
+	OpModeSwitch    = "switch" // FIXME
+	OpModeAggregate = "aggregate"
+	OpModeMirror    = "mirror"
+)
+
+const (
+	POEModeAuto   = "auto"
+	POEModeOff    = "off"
+	POEModePasv24 = "pasv24"
 )
 
 type PortOverride struct {
