@@ -39,7 +39,7 @@ type Port struct {
 	PoeVoltage     string `json:"poe_voltage"`
 	PortIdx        int    `json:"port_idx"`
 	PortPoe        bool   `json:"port_poe"`
-	PortconfId     string `json:"portconf_id"`
+	PortconfID     string `json:"portconf_id"`
 	RxBroadcast    int64  `json:"rx_broadcast"`
 	RxBytes        int64  `json:"rx_bytes"`
 	RxBytesR       int64  `json:"rx_bytes-r"`
@@ -89,7 +89,7 @@ type RadioTable struct {
 
 type Uplink struct {
 	FullDuplex       bool `json:"full_duplex"`
-	Ip               string
+	IP               string
 	LagMember        bool `json:"lag_member"`
 	Mac              string
 	MaxSpeed         int64 `json:"max_speed"`
@@ -343,7 +343,7 @@ type GenericDevice struct {
 	PortTable           []Port         `json:"port_table"`
 	RxBytes             int            `json:"rx_bytes"`
 	Serial              string
-	SiteId              string `json:"site_id"`
+	SiteID              string `json:"site_id"`
 	State               int
 	SysStats            SysStats `json:"sys_stats"` // Seems to be the replacement of system-stats
 	TxBytes             int      `json:"tx_bytes"`
@@ -425,8 +425,8 @@ type UAP struct {
 	VwireEnabled      bool
 	VwireTable        []VwireTable `json:"vwire_table"`
 	WifiCaps          int          `json:"wifi_caps"`
-	WlanGroupIdNa     string       `json:"wlangroup_id_na"`
-	WlanGroupIdNg     string       `json:"wlangroup_id_na"`
+	WlanGroupIDNa     string       `json:"wlangroup_id_na"`
+	WlanGroupIDNg     string       `json:"wlangroup_id_ng"`
 	XAuthkey          string       `json:"x_authkey"`
 	XFingerprint      string       `json:"x_fingerprint"`
 	XVwirekey         string       `json:"x_vwirekey"`
@@ -544,15 +544,15 @@ func (a UAP) Status() string {
 	return "unknown"
 }
 
-func (a USW) Status() string {
-	if s, ok := status[a.State]; ok {
-		return s
-	}
-	return "unknown"
-}
-
 func (a UAP) SetU(u *Unifi) {
 	if u != nil {
 		a.u = u
 	}
+}
+
+func (s USW) Status() string {
+	if v, ok := status[s.State]; ok {
+		return v
+	}
+	return "unknown"
 }

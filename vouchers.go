@@ -21,7 +21,7 @@ type Voucher struct {
 	Note         string
 	QosOverwrite bool `json:"qos_overwrite"`
 	Quota        int
-	SiteId       string `json:"site_id"`
+	SiteID       string `json:"site_id"`
 	Used         int
 }
 

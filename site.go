@@ -4,13 +4,11 @@
 
 package unifi
 
-//type StaMap map[string]Sta
-
 // Station data
 type Site struct {
 	//u                *Unifi
-	Id           string `json:"_id"` // For internal use
-	AttrHiddenId string `json:"attr_hidden_id"`
+	ID           string `json:"_id"` // For internal use
+	AttrHiddenID string `json:"attr_hidden_id"`
 	AttrNoDelete bool   `json:"attr_no_delete"`
 	Desc         string // The name of the site!
 	Name         string // The site-id!

@@ -61,11 +61,11 @@ func main() {
 	overrides := usw.PortOverrides
 
 	var found bool
-	for idx, _ := range usw.PortOverrides {
-		if overrides[idx].PortIdx == *index {
-			overrides[idx].PortconfID = profile.ID
-			overrides[idx].POEMode = unifi.POEMODE_OFF
-			overrides[idx].Name = "Disable-Test"
+	for i := range usw.PortOverrides {
+		if overrides[i].PortIdx == *index {
+			overrides[i].PortconfID = profile.ID
+			overrides[i].POEMode = unifi.POEModeOff
+			overrides[i].Name = "Disable-Test"
 			found = true
 			break
 		}
@@ -75,7 +75,7 @@ func main() {
 		var o unifi.PortOverride
 		o.PortIdx = *index
 		o.PortconfID = profile.ID
-		o.POEMode = unifi.POEMODE_OFF
+		o.POEMode = unifi.POEModeOff
 		o.Name = "Disable-Test"
 		overrides = append(overrides, o)
 	}
