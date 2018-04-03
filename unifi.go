@@ -39,7 +39,7 @@ type login struct {
 }
 
 // Initializes a session.  If site != "", it's to a V3 controller.
-func Login(user, pass, host, site string, version int) (*Unifi, error) {
+func Login(user, pass, host, port, site string, version int) (*Unifi, error) {
 	u := new(Unifi)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -49,7 +49,7 @@ func Login(user, pass, host, site string, version int) (*Unifi, error) {
 		Transport: tr,
 		Jar:       cj,
 	}
-	u.baseURL = "https://" + host + ":8443/"
+	u.baseURL = "https://" + host + ":" + port + "/"
 	u.version = version
 	if u.version >= 4 {
 		l := new(login)
@@ -76,6 +76,12 @@ func Login(user, pass, host, site string, version int) (*Unifi, error) {
 		}
 	}
 	if u.version >= 3 {
+		// Try to resolve the site by description (i.e. user friendly name)
+		sitename, err := u.siteNameByDesc(site)
+		if err == nil {
+			site = sitename
+		}
+
 		u.apiURL = u.baseURL + "api/s/" + site + "/"
 	} else {
 		u.apiURL = u.baseURL + "api/"
@@ -89,7 +95,15 @@ func (u *Unifi) Logout() {
 }
 
 func (u *Unifi) apicmd(cmd string) ([]byte, error) {
-	resp, err := u.client.Get(u.apiURL + cmd)
+	// The sites command is global, the others are site specific
+	var url string
+	if cmd == "api/self/sites" {
+		url = u.baseURL + cmd
+	} else {
+		url = u.apiURL + cmd
+	}
+
+	resp, err := u.client.Get(url)
 	if err != nil {
 		return nil, err
 	}
@@ -99,6 +113,44 @@ func (u *Unifi) apicmd(cmd string) ([]byte, error) {
 		return nil, err
 	}
 	return body, nil
+}
+
+func (u *Unifi) apicmdPut(cmd string, data interface{}) error {
+
+	url := u.apiURL + cmd
+
+	j, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	//fmt.Printf("%+v\n", j)
+	fmt.Println(string(j))
+	r := bytes.NewReader(j)
+
+	req, err := http.NewRequest(http.MethodPut, url, r)
+
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "application/json;charset=UTF-8")
+
+	// Send request
+	resp, err := u.client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	if err != nil {
+		return err
+	}
+	fmt.Println(resp.Status)
+	if resp.StatusCode != 200 {
+		return fmt.Errorf(resp.Status)
+	}
+
+	return nil
 }
 
 type command struct {
@@ -149,29 +201,148 @@ func (u *Unifi) parse(cmd string, v interface{}) error {
 }
 
 // Returns a slice of access points
-func (u *Unifi) Aps() ([]Aps, error) {
-	var response struct {
-		Data []Aps
-		Meta meta
+func (u *Unifi) Aps() ([]UAP, error) {
+
+	var uaps []UAP
+
+	devices, err := u.Devices()
+	if err != nil {
+		return uaps, err
 	}
-	err := u.parse("stat/device", &response)
-	for i := range response.Data {
-		response.Data[i].u = u
+
+	for _, d := range devices {
+
+		var devicetype string
+		devicetype = reflect.ValueOf(d).Type().String()
+
+		switch devicetype {
+		case "unifi.UAP":
+			d := d.(UAP)
+			uaps = append(uaps, d)
+		}
 	}
-	return response.Data, err
+	return uaps, err
 }
 
 // Returns a map of access points with mac as a key
-func (u *Unifi) ApsMap() (ApsMap, error) {
+func (u *Unifi) ApsMap() (UAPmap, error) {
 	aps, err := u.Aps()
 	if err != nil {
 		return nil, err
 	}
-	m := make(ApsMap)
+	m := make(UAPmap)
 	for _, a := range aps {
 		m[a.Mac] = a
 	}
 	return m, nil
+}
+
+// Returns a slice of devices
+func (u *Unifi) Devices() ([]interface{}, error) {
+	// Delay parsing until we know the type
+	//var rawDevices []json.RawMessage
+
+	// Devices
+	var genericDevices []interface{}
+	var response struct {
+		Data []json.RawMessage
+		Meta meta
+	}
+	err := u.parse("stat/device", &response)
+
+	// Get the device list
+	//err := parse(&raw)
+
+	// Now do the magic
+	for _, device := range response.Data {
+
+		// unmarshal into a map to check the "type" field
+		var obj map[string]interface{}
+		err := json.Unmarshal(device, &obj)
+		if err != nil {
+			fmt.Println("Raw JSON Unmarshaling failed") // TODO Remove and handle correctly
+		}
+
+		devicetype := ""
+		if t, ok := obj["type"].(string); ok {
+			devicetype = t
+		}
+		// unmarshal again into the correct type
+		switch devicetype {
+		case "uap":
+			var uap UAP
+			err = json.Unmarshal(device, &uap)
+
+			if err == nil {
+				uap.u = u // Set API pointer
+				genericDevices = append(genericDevices, uap)
+			} else {
+				fmt.Println(err) // TODO Handle correctly
+			}
+
+		case "usw":
+			var usw USW
+			err = json.Unmarshal(device, &usw)
+			if err == nil {
+				usw.u = u // Set API pointer
+				genericDevices = append(genericDevices, usw)
+			}
+
+		default:
+			fmt.Println("Unknown device")
+		}
+
+	}
+	return genericDevices, err
+}
+
+// Returns a map of access points with mac as a key
+func (u *Unifi) DeviceMap() (DeviceMap, error) {
+	devices, err := u.Devices()
+	if err != nil {
+		return nil, err
+	}
+	m := make(DeviceMap)
+	for _, d := range devices {
+		var devicetype string
+		devicetype = reflect.ValueOf(d).Type().String()
+
+		switch devicetype {
+		case "unifi.UAP":
+			// Type assertion from interface to unifi.Uap
+			d := d.(UAP)
+			m[d.Mac] = d
+
+		case "unifi.USW":
+			// Type assertion from interface to unifi.Uap
+			d := d.(USW)
+			m[d.Mac] = d
+		}
+
+	}
+	return m, nil
+}
+
+// Returns a USW pointer for USW with a given name
+func (u *Unifi) USW(name string) (*USW, error) {
+	devices, err := u.Devices()
+	if err != nil {
+		return nil, err
+	}
+	for _, d := range devices {
+		var devicetype string
+		devicetype = reflect.ValueOf(d).Type().String()
+
+		switch devicetype {
+		case "unifi.USW":
+			// Type assertion from interface to unifi.Uap
+			d := d.(USW)
+			if name == d.DeviceName() {
+				return &d, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf("No device with name: %s", name)
 }
 
 // Returns a slice of stations
@@ -210,6 +381,81 @@ func (u *Unifi) Users() ([]User, error) {
 	return response.Data, err
 }
 
+// Returns a slice of known networks
+func (u *Unifi) Networks() ([]Network, error) {
+	var response struct {
+		Data []Network
+		Meta meta
+	}
+	err := u.parse("rest/networkconf", &response)
+	return response.Data, err
+}
+
+// Returns a map of networkconfigs with ID as key
+func (u *Unifi) NetworkMap() (NetworkMap, error) {
+	networks, err := u.Networks()
+	if err != nil {
+		return nil, err
+	}
+	m := make(NetworkMap)
+	for _, n := range networks {
+		m[n.ID] = n
+	}
+	return m, nil
+}
+
+// Returns a slice of known portconfigs
+func (u *Unifi) PortProfiles() ([]PortProfile, error) {
+	var response struct {
+		Data []PortProfile
+		Meta meta
+	}
+	err := u.parse("list/portconf", &response)
+	return response.Data, err
+}
+
+// Returns a map of networkconfigs with ID as key
+func (u *Unifi) PortProfileMap() (PortprofileMap, error) {
+	profiles, err := u.PortProfiles()
+	if err != nil {
+		return nil, err
+	}
+	m := make(PortprofileMap)
+	for _, p := range profiles {
+		m[p.ID] = p
+	}
+	return m, nil
+}
+
+// Returns a map of networkconfigs with ID as key
+func (u *Unifi) PortProfile(name string) (*PortProfile, error) {
+
+	profiles, err := u.PortProfiles()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, p := range profiles {
+		if p.Name == name {
+			return &p, err
+		}
+	}
+	return nil, fmt.Errorf("No Profile with name: %s", name)
+}
+
+// Sets the portoverrides of a given device
+func (u *Unifi) SetPortoverrides(deviceid string, o []PortOverride) error {
+
+	cmd := fmt.Sprintf("rest/device/%s", deviceid)
+
+	// Create a map with port_overrides as key and a slice of overrides as value
+	m := make(map[string][]PortOverride)
+	m["port_overrides"] = o
+	err := u.apicmdPut(cmd, m)
+
+	return err
+}
+
 // Returns user groups
 func (u *Unifi) UserGroups() ([]UserGroup, error) {
 	var response struct {
@@ -218,6 +464,32 @@ func (u *Unifi) UserGroups() ([]UserGroup, error) {
 	}
 	err := u.parse("list/usergroup", &response)
 	return response.Data, err
+}
+
+// Returns a slice of all sites
+func (u *Unifi) Sites() ([]Site, error) {
+	var response struct {
+		Data []Site
+		Meta meta
+	}
+	err := u.parse("api/self/sites", &response)
+	return response.Data, err
+}
+
+// Returns the name (id) of a site, searched by its description (user friendly name)
+func (u *Unifi) siteNameByDesc(desc string) (string, error) {
+	sites, err := u.Sites()
+	if err != nil {
+		return "", err
+	}
+
+	for _, s := range sites {
+		if s.Desc == desc {
+			return s.Name, nil
+		}
+	}
+
+	return "", errors.New("No site with desc: " + desc)
 }
 
 // Returns a Wlan config

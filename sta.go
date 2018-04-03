@@ -8,82 +8,59 @@ type StaMap map[string]Sta
 
 // Station data
 type Sta struct {
-	u                *Unifi
-	ApMac            string `json:"ap_mac"`
-	AssocTime        int    //Timestamp
-	AuthTime         int    //Timestamp
-	Authorized       bool
-	BssID            string
-	Bytes            int
-	BytesD           int `json:"bytes.d"`
-	BytesR           int `json:"bytes.r"`
-	Ccq              int
-	Channel          int
-	DhcpendTime      int `json:"dhcpend_time"`
-	DhcpstartTime    int `json:"dhcpstart_time"`
-	EssID            string
-	FirstSeen        int //Timestamp
-	Hostname         string
-	Idletime         int
-	IP               string
-	Is11a            bool `json:"is_11a"`
-	Is11ac           bool `json:"is_11ac"`
-	Is11b            bool `json:"is_11b"`
-	Is11n            bool `json:"is_11n"`
-	IsGuest          bool `json:"is_guest"`
-	LastSeen         int  //Timestamp
-	Mac              string
-	MapID            string `json:"map_id"`
-	Noise            int
-	Oui              string
-	PowersaveEnabled bool `json:"powersave_enabled"`
-	QosPolicyApplied bool `json:"qos_policy_applied"`
-	Radio            string
-	RoamCount        int `json:"roam_count"`
-	Rssi             int
-	RxBytes          int `json:"rx_bytes"`
-	RxBytesD         int `json:"rx_bytes.d"`
-	RxBytesR         int `json:"rx_bytes.r"`
-	RxCrypts         int `json:"rx_crypts"`
-	RxCryptsD        int `json:"rx_crytps.d"`
-	RxCryptsR        int `json:"rx_crytps.r"`
-	RxDropped        int `json:"rx_dropped"`
-	RxDroppedD       int `json:"rx_dropped.d"`
-	RxDroppedR       int `json:"rx_dropped.r"`
-	RxErrors         int `json:"rx_errors"`
-	RxErrorsD        int `json:"rx_errors.d"`
-	RxErrorsR        int `json:"rx_errors.r"`
-	RxFrags          int `json:"rx_frags"`
-	RxFragsD         int `json:"rx_frags.d"`
-	RxFragsR         int `json:"rx_frags.r"`
-	RxPackets        int `json:"rx_packets"`
-	RxPacketsD       int `json:"rx_packets.d"`
-	RxPacketsR       int `json:"rx_packets.r"`
-	RxRate           int `json:"rx_rate"`
-	Signal           int
-	State            int
-	StateHt          bool `json:"state_ht"`
-	StatePwrmgt      bool `json:"state_pwrmgt"`
-	T                string
-	TxBytes          int `json:"tx_bytes"`
-	TxBytesD         int `json:"tx_bytes.d"`
-	TxBytesR         int `json:"tx_bytes.r"`
-	TxDropped        int `json:"tx_dropped"`
-	TxDroppedD       int `json:"tx_dropped.d"`
-	TxDroppedR       int `json:"tx_dropped.r"`
-	TxErrors         int `json:"tx_errors"`
-	TxErrorsD        int `json:"tx_errors.d"`
-	TxErrorsR        int `json:"tx_errors.r"`
-	TxPackets        int `json:"tx_packets"`
-	TxPacketsD       int `json:"tx_packets.d"`
-	TxPacketsR       int `json:"tx_packets.r"`
-	TxPower          int `json:"tx_power"`
-	TxRate           int `json:"tx_rate"`
-	TxRetries        int `json:"tx_retries"`
-	TxRetriesD       int `json:"tx_retries.d"`
-	TxRetriesR       int `json:"tx_retries.r"`
-	Uptime           int
+	u                *Unifi `jsonn:-`
+	ID               string `json:"_id"`
+	IsGuestByUsw     bool   `json:"_is_guest_by_usw,omitempty"`
+	LastSeenByUsw    int    `json:"_last_seen_by_usw,omitempty"`
+	UptimeByUsw      int    `json:"_uptime_by_usw,omitempty"`
+	AssocTime        int    `json:"assoc_time"`
+	FirstSeen        int    `json:"first_seen"`
+	IP               string `json:"ip"`
+	IsGuest          bool   `json:"is_guest"`
+	IsWired          bool   `json:"is_wired"`
+	LastSeen         int    `json:"last_seen"`
+	LatestAssocTime  int    `json:"latest_assoc_time"`
+	Mac              string `json:"mac"`
+	Network          string `json:"network,omitempty"`
+	NetworkID        string `json:"network_id,omitempty"`
+	Oui              string `json:"oui"`
+	SiteID           string `json:"site_id"`
+	SwDepth          int    `json:"sw_depth,omitempty"`
+	SwMac            string `json:"sw_mac,omitempty"`
+	SwPort           int    `json:"sw_port,omitempty"`
+	Uptime           int    `json:"uptime"`
 	UserID           string `json:"user_id"`
+	Hostname         string `json:"hostname,omitempty"`
+	IsGuestByUap     bool   `json:"_is_guest_by_uap,omitempty"`
+	LastSeenByUap    int    `json:"_last_seen_by_uap,omitempty"`
+	RoamCount        int    `json:"roam_count",,omitempty`
+	UptimeByUap      int    `json:"_uptime_by_uap,omitempty"`
+	ApMac            string `json:"ap_mac,omitempty"`
+	Authorized       bool   `json:"authorized,omitempty"`
+	BSSID            string `json:"bssid,omitempty"`
+	BytesR           int    `json:"bytes-r,omitempty"`
+	Ccq              int    `json:"ccq,omitempty"`
+	Channel          int    `json:"channel,omitempty"`
+	ESSID            string `json:"essid,omitempty"`
+	Idletime         int    `json:"idletime,omitempty"`
+	Is11R            bool   `json:"is_11r,omitempty"`
+	Noise            int    `json:"noise,omitempty"`
+	PowersaveEnabled bool   `json:"powersave_enabled,omitempty"`
+	QosPolicyApplied bool   `json:"qos_policy_applied,omitempty"`
+	Radio            string `json:"radio,omitempty"`
+	RadioProto       string `json:"radio_proto,omitempty"`
+	Rssi             int    `json:"rssi,omitempty"`
+	RxBytes          int    `json:"rx_bytes,omitempty"`
+	RxBytesR         int    `json:"rx_bytes-r,omitempty"`
+	RxPackets        int    `json:"rx_packets,omitempty"`
+	RxRate           int    `json:"rx_rate,omitempty"`
+	Signal           int    `json:"signal,omitempty"`
+	TxBytes          int    `json:"tx_bytes,omitempty"`
+	TxBytesR         int    `json:"tx_bytes-r,omitempty"`
+	TxPackets        int    `json:"tx_packets,omitempty"`
+	TxPower          int    `json:"tx_power,omitempty"`
+	TxRate           int    `json:"tx_rate,omitempty"`
+	Vlan             int    `json:"vlan,omitempty"`
 }
 
 // Returns a station name

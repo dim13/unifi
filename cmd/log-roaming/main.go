@@ -31,14 +31,15 @@ var (
 	host    = flag.String("host", "unifi", "Controller hostname")
 	user    = flag.String("user", "admin", "Controller username")
 	pass    = flag.String("pass", "unifi", "Controller password")
-	version = flag.Int("version", 2, "Controller base version")
+	version = flag.Int("version", 5, "Controller base version")
+	port    = flag.String("port", "8443", "Controller port")
 	siteid  = flag.String("siteid", "default", "Site ID, UniFi v3 only")
 	delay   = flag.Duration("delay", 5*time.Second, "delay")
 )
 
 func main() {
 	flag.Parse()
-	u, err := unifi.Login(*user, *pass, *host, *siteid, *version)
+	u, err := unifi.Login(*user, *pass, *host, *port, *siteid, *version)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,7 +71,7 @@ func main() {
 				IP:      s.IP,
 				Ap:      apsmap[s.ApMac].Name,
 				Channel: s.Channel,
-				Essid:   s.EssID,
+				Essid:   s.ESSID,
 			}
 		}
 		for k, v := range newmap {
