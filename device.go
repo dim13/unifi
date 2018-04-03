@@ -4,23 +4,6 @@
 
 package unifi
 
-// Spanning-Tree states
-const STP_DISABLED = 0
-const STP_BLOCKING = 1
-const STP_LISTENING = 2
-const STP_LEARNING = 3
-const STP_FORWARDING = 4
-const STP_UNKNOWN = 9
-
-var stpName = map[int]string{
-	STP_DISABLED:   "Disabled",
-	STP_BLOCKING:   "Blocking",
-	STP_LISTENING:  "Listening",
-	STP_LEARNING:   "Learning",
-	STP_FORWARDING: "Forwarding",
-	STP_UNKNOWN:    "Unknown",
-}
-
 type ConfigNetwork struct {
 	IP   string
 	Type string
@@ -569,5 +552,4 @@ func (a UAP) SetU(u *Unifi) {
 	if u != nil {
 		a.u = u
 	}
-	return
 }

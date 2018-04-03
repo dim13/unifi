@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -63,25 +62,16 @@ func main() {
 			deviceMac = s.SwMac
 		}
 
-		if deviceMac != "" {
-
-		}
 		d := aps[deviceMac]
-		var devicetype string
-		devicetype = reflect.ValueOf(d).Type().String()
 
-		switch devicetype {
-		case "unifi.UAP":
-			// Type assertion from interface to unifi.Uap
-			d := d.(unifi.UAP)
-			deviceName = d.DeviceName()
-			modelName = d.ModelName()
+		switch v := d.(type) {
+		case unifi.UAP:
+			deviceName = v.DeviceName()
+			modelName = v.ModelName()
 
-		case "unifi.USW":
-			// Type assertion from interface to unifi.Uap
-			d := d.(unifi.USW)
-			deviceName = d.DeviceName()
-			modelName = d.ModelName()
+		case unifi.USW:
+			deviceName = v.DeviceName()
+			modelName = v.ModelName()
 		}
 
 		p := []string{

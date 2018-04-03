@@ -56,19 +56,11 @@ func main() {
 
 	if err != nil {
 		log.Fatalln(err)
-		return
 	}
+
+	overrides := usw.PortOverrides
 
 	var found bool
-
-	if err != nil {
-		log.Fatalln(err)
-		return
-	}
-
-	var overrides []unifi.PortOverride
-	overrides = usw.PortOverrides
-
 	for idx, _ := range usw.PortOverrides {
 		if overrides[idx].PortIdx == *index {
 			overrides[idx].PortconfID = profile.ID
@@ -79,7 +71,7 @@ func main() {
 		}
 	}
 	// If not found, create a new override for the given port and add it to the slice
-	if found == false {
+	if !found {
 		var o unifi.PortOverride
 		o.PortIdx = *index
 		o.PortconfID = profile.ID
@@ -88,6 +80,4 @@ func main() {
 		overrides = append(overrides, o)
 	}
 	u.SetPortoverrides(usw.DeviceID, overrides)
-
-	return
 }

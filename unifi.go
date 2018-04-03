@@ -176,10 +176,8 @@ func (u *Unifi) maccmd(mgr string, args interface{}) error {
 		return err
 	}
 	val := url.Values{"json": {string(param)}}
-	if _, err := u.client.PostForm(u.apiURL+"cmd/"+mgr, val); err != nil {
-		return err
-	}
-	return nil
+	_, err = u.client.PostForm(u.apiURL+"cmd/"+mgr, val)
+	return err
 }
 
 func (u *Unifi) parse(cmd string, v interface{}) error {
@@ -210,14 +208,9 @@ func (u *Unifi) Aps() ([]UAP, error) {
 	}
 
 	for _, d := range devices {
-
-		var devicetype string
-		devicetype = reflect.ValueOf(d).Type().String()
-
-		switch devicetype {
-		case "unifi.UAP":
-			d := d.(UAP)
-			uaps = append(uaps, d)
+		switch dev := d.(type) {
+		case UAP:
+			uaps = append(uaps, dev)
 		}
 	}
 	return uaps, err
@@ -303,19 +296,12 @@ func (u *Unifi) DeviceMap() (DeviceMap, error) {
 	}
 	m := make(DeviceMap)
 	for _, d := range devices {
-		var devicetype string
-		devicetype = reflect.ValueOf(d).Type().String()
+		switch dev := d.(type) {
+		case UAP:
+			m[dev.Mac] = dev
 
-		switch devicetype {
-		case "unifi.UAP":
-			// Type assertion from interface to unifi.Uap
-			d := d.(UAP)
-			m[d.Mac] = d
-
-		case "unifi.USW":
-			// Type assertion from interface to unifi.Uap
-			d := d.(USW)
-			m[d.Mac] = d
+		case USW:
+			m[dev.Mac] = dev
 		}
 
 	}
@@ -329,15 +315,10 @@ func (u *Unifi) USW(name string) (*USW, error) {
 		return nil, err
 	}
 	for _, d := range devices {
-		var devicetype string
-		devicetype = reflect.ValueOf(d).Type().String()
-
-		switch devicetype {
-		case "unifi.USW":
-			// Type assertion from interface to unifi.Uap
-			d := d.(USW)
-			if name == d.DeviceName() {
-				return &d, nil
+		switch dev := d.(type) {
+		case USW:
+			if name == dev.DeviceName() {
+				return &dev, nil
 			}
 		}
 	}

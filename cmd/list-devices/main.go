@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -28,11 +27,11 @@ var (
 )
 
 func main() {
+	flag.Parse()
+
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 3, ' ', 0)
 	defer w.Flush()
-
-	flag.Parse()
 
 	u, err := unifi.Login(*user, *pass, *host, *port, *siteid, *version)
 	if err != nil {
@@ -40,9 +39,7 @@ func main() {
 	}
 	defer u.Logout()
 
-	// Returns a slice of devices
 	devices, err := u.Devices()
-
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -53,44 +50,35 @@ func main() {
 	fmt.Fprintln(w, "Type\tName\tIP\tMac\tModelName\tVersion\tStatus\tNumberOfClients\tTxBytes\tRxBytes")
 
 	for _, d := range devices {
-		var devicetype string
-		devicetype = reflect.ValueOf(d).Type().String()
-
-		switch devicetype {
-		case "unifi.UAP":
-			// Type assertion from interface to unifi.Uap
-			d := d.(unifi.UAP)
-
+		switch dev := d.(type) {
+		case unifi.UAP:
 			p := []string{
 				"AP    ",
-				d.DeviceName(),
-				d.IP,
-				d.Mac,
-				d.ModelName(),
-				d.Version,
-				d.Status(),
-				strconv.Itoa(d.NumSta),
-				unifi.Bytes(d.TxBytes).String(),
-				unifi.Bytes(d.RxBytes).String(),
+				dev.DeviceName(),
+				dev.IP,
+				dev.Mac,
+				dev.ModelName(),
+				dev.Version,
+				dev.Status(),
+				strconv.Itoa(dev.NumSta),
+				unifi.Bytes(dev.TxBytes).String(),
+				unifi.Bytes(dev.RxBytes).String(),
 			}
 			fmt.Fprintln(w, strings.Join(p, "\t"))
 			numberOfAps++
 
-		case "unifi.USW":
-			// Type assertion from interface to unifi.Uap
-			d := d.(unifi.USW)
-
+		case unifi.USW:
 			p := []string{
 				"Switch",
-				d.DeviceName(),
-				d.IP,
-				d.Mac,
-				d.ModelName(),
-				d.Version,
-				d.Status(),
-				strconv.Itoa(d.NumSta),
-				unifi.Bytes(d.TxBytes).String(),
-				unifi.Bytes(d.RxBytes).String(),
+				dev.DeviceName(),
+				dev.IP,
+				dev.Mac,
+				dev.ModelName(),
+				dev.Version,
+				dev.Status(),
+				strconv.Itoa(dev.NumSta),
+				unifi.Bytes(dev.TxBytes).String(),
+				unifi.Bytes(dev.RxBytes).String(),
 			}
 			fmt.Fprintln(w, strings.Join(p, "\t"))
 			numberOfSwitches++

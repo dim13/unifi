@@ -18,7 +18,7 @@ var (
 	host    = flag.String("host", "unifi", "Controller hostname")
 	user    = flag.String("user", "admin", "Controller username")
 	pass    = flag.String("pass", "unifi", "Controller password")
-	version = flag.Int("version", 5, "Controller base version")
+	version = flag.Int("version", 4, "Controller base version")
 	port    = flag.String("port", "8443", "Controller port")
 	siteid  = flag.String("siteid", "default", "Site ID, UniFi v3 only")
 )
@@ -29,10 +29,6 @@ func main() {
 	defer w.Flush()
 
 	flag.Parse()
-	version := new(int)
-	siteid := new(string)
-	*version = 4
-	*siteid = "default"
 
 	u, err := unifi.Login(*user, *pass, *host, *port, *siteid, *version)
 	if err != nil {
