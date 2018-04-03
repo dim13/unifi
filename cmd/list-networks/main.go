@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"text/tabwriter"
 
-	"github.com/BFLB/unifi"
+	"github.com/dim13/unifi"
 )
 
 var (
