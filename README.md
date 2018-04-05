@@ -9,8 +9,3 @@ Port of https://github.com/calmh/unifi-api to Golang
 
 A library is a work-in-progress. Far away of beeing complete.
 Suggestions and patches are welcome.
-
-# Note
-
-I don't have any hardware to test anymore, thus please consider
-this project as abandoned.
