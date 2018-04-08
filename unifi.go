@@ -19,7 +19,8 @@ import (
 )
 
 var (
-	ErrLoginFirst = errors.New("login first")
+	ErrLoginFirst  = errors.New("login first")
+	minimalVersion = 4
 )
 
 type Unifi struct {
@@ -38,8 +39,12 @@ type login struct {
 	Password string `json:"password"`
 }
 
-// Initializes a session.  If site != "", it's to a V3 controller.
+// Initializes a session.  Only controller versions 4 and newer are supported
 func Login(user, pass, host, port, site string, version int) (*Unifi, error) {
+	if version < 4 {
+		return nil, fmt.Errorf("API version %d unsuported. (Minimal version: %d)", version, minimalVersion)
+	}
+
 	u := new(Unifi)
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -51,41 +56,22 @@ func Login(user, pass, host, port, site string, version int) (*Unifi, error) {
 	}
 	u.baseURL = "https://" + host + ":" + port + "/"
 	u.version = version
-	if u.version >= 4 {
-		l := new(login)
-		l.Username = user
-		l.Password = pass
-		j, err := json.Marshal(l)
-		if err != nil {
-			return nil, err
-		}
-		r := bytes.NewReader(j)
-		if _, err := u.client.Post(u.baseURL+"api/login", "application/json", r); err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-	} else {
-		val := url.Values{
-			"login":    {"login"},
-			"username": {user},
-			"password": {pass},
-		}
-		if _, err := u.client.PostForm(u.baseURL+"login", val); err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-	}
-	if u.version >= 3 {
-		// Try to resolve the site by description (i.e. user friendly name)
-		sitename, err := u.siteNameByDesc(site)
-		if err == nil {
-			site = sitename
-		}
 
-		u.apiURL = u.baseURL + "api/s/" + site + "/"
-	} else {
-		u.apiURL = u.baseURL + "api/"
+	l := new(login)
+	l.Username = user
+	l.Password = pass
+	j, err := json.Marshal(l)
+	if err != nil {
+		return nil, err
 	}
+	r := bytes.NewReader(j)
+	if _, err := u.client.Post(u.baseURL+"api/login", "application/json", r); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	u.apiURL = u.baseURL + "api/"
+
 	return u, nil
 }
 
@@ -94,14 +80,17 @@ func (u *Unifi) Logout() {
 	u.client.Get(u.baseURL + "logout")
 }
 
-func (u *Unifi) apicmd(cmd string) ([]byte, error) {
-	// The sites command is global, the others are site specific
-	var url string
-	if cmd == "api/self/sites" {
-		url = u.baseURL + cmd
-	} else {
-		url = u.apiURL + cmd
+func (u *Unifi) apicmd(site *Site, cmd string) ([]byte, error) {
+
+	url := u.apiURL
+
+	// For site specific command, add site settings
+	if site != nil {
+		url += fmt.Sprintf("s/%s/", site.Name)
 	}
+
+	// Add the command to the url
+	url += cmd
 
 	resp, err := u.client.Get(url)
 	if err != nil {
@@ -115,9 +104,17 @@ func (u *Unifi) apicmd(cmd string) ([]byte, error) {
 	return body, nil
 }
 
-func (u *Unifi) apicmdPut(cmd string, data interface{}) error {
+func (u *Unifi) apicmdPut(site *Site, cmd string, data interface{}) error {
 
-	url := u.apiURL + cmd
+	url := u.apiURL
+
+	// For site specific command, add site settings
+	if site != nil {
+		url += fmt.Sprintf("s/%s/", site.Name)
+	}
+
+	// Add the command to the url
+	url += cmd
 
 	j, err := json.Marshal(data)
 	if err != nil {
@@ -180,8 +177,8 @@ func (u *Unifi) maccmd(mgr string, args interface{}) error {
 	return err
 }
 
-func (u *Unifi) parse(cmd string, v interface{}) error {
-	body, err := u.apicmd(cmd)
+func (u *Unifi) parse(site *Site, cmd string, v interface{}) error {
+	body, err := u.apicmd(site, cmd)
 	if err != nil {
 		return err
 	}
@@ -198,11 +195,11 @@ func (u *Unifi) parse(cmd string, v interface{}) error {
 }
 
 // Returns a slice of access points
-func (u *Unifi) Aps() ([]UAP, error) {
+func (u *Unifi) Aps(site *Site) ([]UAP, error) {
 
 	var uaps []UAP
 
-	devices, err := u.Devices()
+	devices, err := u.Devices(site)
 	if err != nil {
 		return uaps, err
 	}
@@ -217,8 +214,8 @@ func (u *Unifi) Aps() ([]UAP, error) {
 }
 
 // Returns a map of access points with mac as a key
-func (u *Unifi) ApsMap() (UAPmap, error) {
-	aps, err := u.Aps()
+func (u *Unifi) ApsMap(site *Site) (UAPmap, error) {
+	aps, err := u.Aps(site)
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +227,7 @@ func (u *Unifi) ApsMap() (UAPmap, error) {
 }
 
 // Returns a slice of devices
-func (u *Unifi) Devices() ([]interface{}, error) {
+func (u *Unifi) Devices(site *Site) ([]interface{}, error) {
 	// Delay parsing until we know the type
 	//var rawDevices []json.RawMessage
 
@@ -240,7 +237,7 @@ func (u *Unifi) Devices() ([]interface{}, error) {
 		Data []json.RawMessage
 		Meta meta
 	}
-	err := u.parse("stat/device", &response)
+	err := u.parse(site, "stat/device", &response)
 
 	// Get the device list
 	//err := parse(&raw)
@@ -289,8 +286,8 @@ func (u *Unifi) Devices() ([]interface{}, error) {
 }
 
 // Returns a map of access points with mac as a key
-func (u *Unifi) DeviceMap() (DeviceMap, error) {
-	devices, err := u.Devices()
+func (u *Unifi) DeviceMap(site *Site) (DeviceMap, error) {
+	devices, err := u.Devices(site)
 	if err != nil {
 		return nil, err
 	}
@@ -309,8 +306,8 @@ func (u *Unifi) DeviceMap() (DeviceMap, error) {
 }
 
 // Returns a USW pointer for USW with a given name
-func (u *Unifi) USW(name string) (*USW, error) {
-	devices, err := u.Devices()
+func (u *Unifi) USW(site *Site, name string) (*USW, error) {
+	devices, err := u.Devices(site)
 	if err != nil {
 		return nil, err
 	}
@@ -326,12 +323,12 @@ func (u *Unifi) USW(name string) (*USW, error) {
 }
 
 // Returns a slice of stations
-func (u *Unifi) Sta() ([]Sta, error) {
+func (u *Unifi) Sta(site *Site) ([]Sta, error) {
 	var response struct {
 		Data []Sta
 		Meta meta
 	}
-	err := u.parse("stat/sta", &response)
+	err := u.parse(site, "stat/sta", &response)
 	for i := range response.Data {
 		response.Data[i].u = u
 	}
@@ -339,8 +336,8 @@ func (u *Unifi) Sta() ([]Sta, error) {
 }
 
 // Returns a map of stations with MAC as a key
-func (u *Unifi) StaMap() (StaMap, error) {
-	sta, err := u.Sta()
+func (u *Unifi) StaMap(site *Site) (StaMap, error) {
+	sta, err := u.Sta(site)
 	if err != nil {
 		return nil, err
 	}
@@ -352,51 +349,28 @@ func (u *Unifi) StaMap() (StaMap, error) {
 }
 
 // Returns a slice of known users
-func (u *Unifi) Users() ([]User, error) {
+func (u *Unifi) Users(site *Site) ([]User, error) {
 	var response struct {
 		Data []User
 		Meta meta
 	}
-	err := u.parse("list/user", &response)
+	err := u.parse(site, "list/user", &response)
 	return response.Data, err
-}
-
-// Returns a slice of known networks
-func (u *Unifi) Networks() ([]Network, error) {
-	var response struct {
-		Data []Network
-		Meta meta
-	}
-	err := u.parse("rest/networkconf", &response)
-	return response.Data, err
-}
-
-// Returns a map of networkconfigs with ID as key
-func (u *Unifi) NetworkMap() (NetworkMap, error) {
-	networks, err := u.Networks()
-	if err != nil {
-		return nil, err
-	}
-	m := make(NetworkMap)
-	for _, n := range networks {
-		m[n.ID] = n
-	}
-	return m, nil
 }
 
 // Returns a slice of known portconfigs
-func (u *Unifi) PortProfiles() ([]PortProfile, error) {
+func (u *Unifi) PortProfiles(site *Site) ([]PortProfile, error) {
 	var response struct {
 		Data []PortProfile
 		Meta meta
 	}
-	err := u.parse("list/portconf", &response)
+	err := u.parse(site, "list/portconf", &response)
 	return response.Data, err
 }
 
 // Returns a map of networkconfigs with ID as key
-func (u *Unifi) PortProfileMap() (PortprofileMap, error) {
-	profiles, err := u.PortProfiles()
+func (u *Unifi) PortProfileMap(site *Site) (PortprofileMap, error) {
+	profiles, err := u.PortProfiles(site)
 	if err != nil {
 		return nil, err
 	}
@@ -408,9 +382,9 @@ func (u *Unifi) PortProfileMap() (PortprofileMap, error) {
 }
 
 // Returns a map of networkconfigs with ID as key
-func (u *Unifi) PortProfile(name string) (*PortProfile, error) {
+func (u *Unifi) PortProfile(site *Site, name string) (*PortProfile, error) {
 
-	profiles, err := u.PortProfiles()
+	profiles, err := u.PortProfiles(site)
 	if err != nil {
 		return nil, err
 	}
@@ -424,61 +398,35 @@ func (u *Unifi) PortProfile(name string) (*PortProfile, error) {
 }
 
 // Sets the portoverrides of a given device
-func (u *Unifi) SetPortoverrides(deviceid string, o []PortOverride) error {
+func (u *Unifi) SetPortoverrides(site *Site, deviceid string, o []PortOverride) error {
 
 	cmd := fmt.Sprintf("rest/device/%s", deviceid)
 
 	// Create a map with port_overrides as key and a slice of overrides as value
 	m := make(map[string][]PortOverride)
 	m["port_overrides"] = o
-	err := u.apicmdPut(cmd, m)
+	err := u.apicmdPut(site, cmd, m)
 
 	return err
 }
 
 // Returns user groups
-func (u *Unifi) UserGroups() ([]UserGroup, error) {
+func (u *Unifi) UserGroups(site *Site) ([]UserGroup, error) {
 	var response struct {
 		Data []UserGroup
 		Meta meta
 	}
-	err := u.parse("list/usergroup", &response)
+	err := u.parse(site, "list/usergroup", &response)
 	return response.Data, err
-}
-
-// Returns a slice of all sites
-func (u *Unifi) Sites() ([]Site, error) {
-	var response struct {
-		Data []Site
-		Meta meta
-	}
-	err := u.parse("api/self/sites", &response)
-	return response.Data, err
-}
-
-// Returns the name (id) of a site, searched by its description (user friendly name)
-func (u *Unifi) siteNameByDesc(desc string) (string, error) {
-	sites, err := u.Sites()
-	if err != nil {
-		return "", err
-	}
-
-	for _, s := range sites {
-		if s.Desc == desc {
-			return s.Name, nil
-		}
-	}
-
-	return "", errors.New("No site with desc: " + desc)
 }
 
 // Returns a Wlan config
-func (u *Unifi) WlanConf() ([]WlanConf, error) {
+func (u *Unifi) WlanConf(site *Site) ([]WlanConf, error) {
 	var response struct {
 		Data []WlanConf
 		Meta meta
 	}
-	err := u.parse("list/wlanconf", &response)
+	err := u.parse(site, "list/wlanconf", &response)
 	return response.Data, err
 }
 

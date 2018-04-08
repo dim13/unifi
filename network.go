@@ -4,8 +4,10 @@
 
 package unifi
 
+// A map of UniFi Networks with a given attribute as key
 type NetworkMap map[string]Network
 
+// UniFi Network object
 type Network struct {
 	ID                string `json:"_id"`
 	AttrHiddenID      string `json:"attr_hidden_id"`
@@ -24,4 +26,27 @@ type Network struct {
 	Purpose           string `json:"purpose"`
 	SiteID            string `json:"site_id"`
 	VlanEnabled       bool   `json:"vlan_enabled"`
+}
+
+// Networks Returns a slice of known networks
+func (u *Unifi) Networks(site *Site) ([]Network, error) {
+	var response struct {
+		Data []Network
+		Meta meta
+	}
+	err := u.parse(site, "rest/networkconf", &response)
+	return response.Data, err
+}
+
+// NetworkMap Returns a map of networkconfigs of a given site with ID as key
+func (u *Unifi) NetworkMap(site *Site) (NetworkMap, error) {
+	networks, err := u.Networks(site)
+	if err != nil {
+		return nil, err
+	}
+	m := make(NetworkMap)
+	for _, n := range networks {
+		m[n.ID] = n
+	}
+	return m, nil
 }

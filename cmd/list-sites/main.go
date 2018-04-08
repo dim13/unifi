@@ -2,7 +2,8 @@
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// list associated stations
+// Example program list-sites
+// Prints information of all sites of a controller
 package main
 
 import (
@@ -10,6 +11,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"text/tabwriter"
 
@@ -42,12 +44,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Fprintln(w, "Description\tName\tRole")
+	fmt.Fprintln(w, "Description\tName\tRole\tAttrHiddenID,\tAttrNoDelete")
 	for _, s := range sites {
 		p := []string{
 			s.Desc,
 			s.Name,
 			s.Role,
+			s.AttrHiddenID,
+			strconv.FormatBool(s.AttrNoDelete),
 		}
 		fmt.Fprintln(w, strings.Join(p, "\t"))
 	}

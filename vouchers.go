@@ -42,12 +42,12 @@ type NewVoucher struct {
 //Value with parameters for create New Voucher
 var Nv NewVoucher
 
-func (u *Unifi) Voucher() ([]Voucher, error) {
+func (u *Unifi) Voucher(site *Site) ([]Voucher, error) {
 	var response struct {
 		Data []Voucher
 		Meta meta
 	}
-	err := u.parse("stat/voucher", &response)
+	err := u.parse(site, "stat/voucher", &response)
 	for i := range response.Data {
 		response.Data[i].u = u
 	}
@@ -55,8 +55,8 @@ func (u *Unifi) Voucher() ([]Voucher, error) {
 	return response.Data, err
 }
 
-func (u *Unifi) VoucherMap() (VoucherMap, error) {
-	vouch, err := u.Voucher()
+func (u *Unifi) VoucherMap(site *Site) (VoucherMap, error) {
+	vouch, err := u.Voucher(site)
 	if err != nil {
 		return nil, err
 	}
