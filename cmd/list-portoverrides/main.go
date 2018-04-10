@@ -2,7 +2,8 @@
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// list devices
+// Example command list port-overrides
+// list port-overrides of a given device
 package main
 
 import (
@@ -22,7 +23,7 @@ var (
 	pass    = flag.String("pass", "unifi", "Controller password")
 	port    = flag.String("port", "8443", "Controller port")
 	version = flag.Int("version", 5, "Controller base version")
-	siteid  = flag.String("siteid", "default", "Site ID, UniFi v3 only")
+	siteid  = flag.String("siteid", "default", "Sitename or description")
 
 	devicename = flag.String("devicename", "", "Name of the device")
 )
@@ -40,14 +41,19 @@ func main() {
 	}
 	defer u.Logout()
 
+	site, err := u.Site(*siteid)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Returns a slice of devices
-	usw, err := u.USW(*devicename)
+	usw, err := u.USW(site, *devicename)
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	pm, err := u.PortProfileMap()
+	pm, err := u.PortProfileMap(site)
 
 	if err != nil {
 		log.Fatalln(err)

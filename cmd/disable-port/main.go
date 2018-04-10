@@ -1,8 +1,9 @@
-// Copyright (c) 2014 Dimitri Sokolyuk. All rights reserved.
+// Copyright (c) 2014 The unifi Authors. All rights reserved.
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// list devices
+// Example command disable-port
+// Disables a port of a USW
 package main
 
 import (
@@ -20,7 +21,7 @@ var (
 	pass    = flag.String("pass", "unifi", "Controller password")
 	port    = flag.String("port", "8443", "Controller port")
 	version = flag.Int("version", 5, "Controller base version")
-	siteid  = flag.String("siteid", "default", "Site ID, UniFi v3 only")
+	siteid  = flag.String("siteid", "default", "Sitename or description")
 
 	devicename = flag.String("devicename", "", "Name of the device")
 	index      = flag.Int("index", 0, "Port Index")
@@ -39,8 +40,13 @@ func main() {
 	}
 	defer u.Logout()
 
+	site, err := u.Site(*siteid)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Returns the USW
-	usw, err := u.USW(*devicename)
+	usw, err := u.USW(site, *devicename)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -52,7 +58,7 @@ func main() {
 
 	// Get port profile name
 	profilename := "Disabled"
-	profile, err := u.PortProfile(profilename)
+	profile, err := u.PortProfile(site, profilename)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -65,7 +71,7 @@ func main() {
 		if overrides[i].PortIdx == *index {
 			overrides[i].PortconfID = profile.ID
 			overrides[i].POEMode = unifi.POEModeOff
-			overrides[i].Name = "Disable-Test"
+			overrides[i].Name = "Disabled by script"
 			found = true
 			break
 		}
@@ -76,8 +82,8 @@ func main() {
 		o.PortIdx = *index
 		o.PortconfID = profile.ID
 		o.POEMode = unifi.POEModeOff
-		o.Name = "Disable-Test"
+		o.Name = "Disabled by script"
 		overrides = append(overrides, o)
 	}
-	u.SetPortoverrides(usw.DeviceID, overrides)
+	u.SetPortoverrides(site, usw.DeviceID, overrides)
 }

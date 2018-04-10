@@ -2,8 +2,8 @@
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// Example program list-sites
-// Prints information of all sites of a controller
+// Example command list-sites
+// List sites of a given controller
 package main
 
 import (

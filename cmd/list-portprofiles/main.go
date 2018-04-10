@@ -2,7 +2,8 @@
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// list devices
+// Example command list-portprofile
+// list portprofiles of a given site
 package main
 
 import (
@@ -23,7 +24,7 @@ var (
 	pass    = flag.String("pass", "unifi", "Controller password")
 	port    = flag.String("port", "8443", "Controller port")
 	version = flag.Int("version", 5, "Controller base version")
-	siteid  = flag.String("siteid", "default", "Site ID, UniFi v3 only")
+	siteid  = flag.String("siteid", "default", "Sitename or desctription")
 )
 
 func main() {
@@ -39,15 +40,20 @@ func main() {
 	}
 	defer u.Logout()
 
+	site, err := u.Site(*siteid)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Returns a slice of devices
-	profiles, err := u.PortProfiles()
+	profiles, err := u.PortProfiles(site)
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	// Returns a map of networks with ID as key
-	nm, err := u.NetworkMap()
+	nm, err := u.NetworkMap(site)
 
 	if err != nil {
 		log.Fatalln(err)

@@ -306,8 +306,6 @@ type SysStats struct {
 	MemTotal  int    `json:"mem_total"`
 }
 
-type UAPmap map[string]UAP
-
 type GenericDevice struct {
 	u                  *Unifi
 	Adopted            bool
@@ -371,6 +369,8 @@ type USW struct {
 	StpPriority        string `json:"stp_priority"`
 }
 
+type USWmap map[string]USW
+
 // Access point data
 type UAP struct {
 	*GenericDevice
@@ -433,25 +433,27 @@ type UAP struct {
 	_Id               string       `json:"_id"`
 }
 
+type UAPmap map[string]UAP
+
 var model = map[string]string{
 	// APs
-	"BZ2":     "UniFi AP",
-	"BZ2LR":   "UniFi AP-LR",
-	"U2S48":   "UniFi AP",
-	"U2L48":   "UniFi AP-LR",
-	"U2HSR":   "UniFi AP-Outdoor+",
-	"U2O":     "UniFi AP-Outdoor",
-	"U5O":     "UniFi AP-Outdoor 5G",
-	"U7P":     "UniFi AP-Pro",
-	"U2M":     "UniFi AP-Mini",
-	"p2N":     "PicoStation M2",
-	"U7E":     "UniFi AP-AC",
-	"U7O":     "UniFi AP-AC Outdoor",
-	"U7Ev2":   "UniFi AP-AC v2",
-	"U7HD":    "UniFi UAP-AC-HD",
-	"U7MSH":   "UniFi UAP-AC-M",
-	"U7MSH??": "UniFi UAP-AC-M-PRO",
-	"U7PG2":   "UniFi UAP-AC-PRO",
+	"BZ2":   "UniFi AP",
+	"BZ2LR": "UniFi AP-LR",
+	"U2S48": "UniFi AP",
+	"U2L48": "UniFi AP-LR",
+	"U2HSR": "UniFi AP-Outdoor+",
+	"U2O":   "UniFi AP-Outdoor",
+	"U5O":   "UniFi AP-Outdoor 5G",
+	"U7P":   "UniFi AP-Pro",
+	"U2M":   "UniFi AP-Mini",
+	"p2N":   "PicoStation M2",
+	"U7E":   "UniFi AP-AC",
+	"U7O":   "UniFi AP-AC Outdoor",
+	"U7Ev2": "UniFi AP-AC v2",
+	"U7HD":  "UniFi UAP-AC-HD",
+	"U7MSH": "UniFi UAP-AC-M",
+	"U7MP":  "UniFi UAP-AC-M-PRO",
+	"U7PG2": "UniFi UAP-AC-PRO",
 	// Switches
 	"US8P150":  "UniFi US-8-150W",
 	"US16P150": "UniFi US-16-150W",

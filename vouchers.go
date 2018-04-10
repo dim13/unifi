@@ -69,20 +69,24 @@ func (u *Unifi) VoucherMap(site *Site) (VoucherMap, error) {
 
 //Functions creating new Vouchers
 
-func (u *Unifi) NewVoucher(nv NewVoucher) ([]Voucher, error) {
+func (u *Unifi) NewVoucher(site *Site, nv NewVoucher) ([]Voucher, error) {
 	var response struct {
 		Data []Voucher
 		Meta meta
 	}
 
 	Nv = nv
-	err := u.parseNewVoucher("cmd/hotspot", &response)
+	err := u.parseNewVoucher(site, "cmd/hotspot", &response)
 	return response.Data, err
 
 }
 
-func (u *Unifi) apicmdNewVoucher(cmd string) ([]byte, error) {
+func (u *Unifi) apicmdNewVoucher(site *Site, cmd string) ([]byte, error) {
 	jsonData := Nv
+
+	// Setup url
+	cmdurl := u.apiURL
+	cmdurl += fmt.Sprintf("s/%s/%s", site.Name, cmd)
 
 	data, err := json.Marshal(jsonData)
 
@@ -91,7 +95,7 @@ func (u *Unifi) apicmdNewVoucher(cmd string) ([]byte, error) {
 	}
 	val := url.Values{"json": {string(data)}}
 
-	resp, err := u.client.PostForm(u.apiURL+cmd, val)
+	resp, err := u.client.PostForm(cmdurl, val)
 
 	if err != nil {
 		return nil, err
@@ -107,8 +111,8 @@ func (u *Unifi) apicmdNewVoucher(cmd string) ([]byte, error) {
 	return body, nil
 }
 
-func (u *Unifi) parseNewVoucher(cmd string, v interface{}) error {
-	body, err := u.apicmdNewVoucher(cmd)
+func (u *Unifi) parseNewVoucher(site *Site, cmd string, v interface{}) error {
+	body, err := u.apicmdNewVoucher(site, cmd)
 	if err != nil {
 		return err
 	}

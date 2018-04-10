@@ -20,7 +20,7 @@ import (
 
 var (
 	ErrLoginFirst  = errors.New("login first")
-	minimalVersion = 4
+	minimalVersion = 5
 )
 
 type Unifi struct {
@@ -39,7 +39,7 @@ type login struct {
 	Password string `json:"password"`
 }
 
-// Initializes a session.  Only controller versions 4 and newer are supported
+// Initializes a session.  Only controller versions 5 and newer are supported
 func Login(user, pass, host, port, site string, version int) (*Unifi, error) {
 	if version < 4 {
 		return nil, fmt.Errorf("API version %d unsuported. (Minimal version: %d)", version, minimalVersion)
@@ -222,6 +222,38 @@ func (u *Unifi) ApsMap(site *Site) (UAPmap, error) {
 	m := make(UAPmap)
 	for _, a := range aps {
 		m[a.Mac] = a
+	}
+	return m, nil
+}
+
+// Returns a slice of access points
+func (u *Unifi) USWs(site *Site) ([]USW, error) {
+
+	var usws []USW
+
+	devices, err := u.Devices(site)
+	if err != nil {
+		return usws, err
+	}
+
+	for _, d := range devices {
+		switch dev := d.(type) {
+		case USW:
+			usws = append(usws, dev)
+		}
+	}
+	return usws, err
+}
+
+// Returns a map of switchdes with mac as a key
+func (u *Unifi) USWmap(site *Site) (USWmap, error) {
+	usws, err := u.USWs(site)
+	if err != nil {
+		return nil, err
+	}
+	m := make(USWmap)
+	for _, usw := range usws {
+		m[usw.Mac] = usw
 	}
 	return m, nil
 }

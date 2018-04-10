@@ -14,11 +14,11 @@ type Sta struct {
 	LastSeenByUsw    int    `json:"_last_seen_by_usw,omitempty"`
 	UptimeByUsw      int    `json:"_uptime_by_usw,omitempty"`
 	AssocTime        int    `json:"assoc_time"`
-	FirstSeen        int    `json:"first_seen"`
+	FirstSeen        int64  `json:"first_seen"`
 	IP               string `json:"ip"`
 	IsGuest          bool   `json:"is_guest"`
 	IsWired          bool   `json:"is_wired"`
-	LastSeen         int    `json:"last_seen"`
+	LastSeen         int64  `json:"last_seen"`
 	LatestAssocTime  int    `json:"latest_assoc_time"`
 	Mac              string `json:"mac"`
 	Network          string `json:"network,omitempty"`

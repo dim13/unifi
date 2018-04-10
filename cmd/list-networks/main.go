@@ -2,9 +2,9 @@
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// Example program list-Networks
-// Prints information of all networks of a given Controller
-// If no site is specified, the networks of all sites are printed
+// Example command list-networks
+// Prints networks of a given site
+// If no site is specified, all of the controllers networks are listed
 
 package main
 
@@ -25,7 +25,7 @@ var (
 	pass    = flag.String("pass", "unifi", "Controller password")
 	port    = flag.String("port", "8443", "Controller port")
 	version = flag.Int("version", 5, "Controller base version")
-	siteid  = flag.String("siteid", "", "Site name or description")
+	siteid  = flag.String("siteid", "", "Sitename or description")
 )
 
 func main() {

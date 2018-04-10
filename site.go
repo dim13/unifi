@@ -18,6 +18,7 @@ type Site struct {
 
 // Site returns a site with given name or description
 func (u *Unifi) Site(desc string) (*Site, error) {
+
 	sites, err := u.Sites()
 	if err != nil {
 		return nil, err
