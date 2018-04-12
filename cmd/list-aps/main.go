@@ -62,7 +62,7 @@ func main() {
 			s.Mac,
 			s.ModelName(),
 			s.Version,
-			s.Status(),
+			s.State.String(),
 			strconv.Itoa(s.NumSta),
 			strings.TrimSpace(unifi.Bytes(s.TxBytes).String()),
 			strings.TrimSpace(unifi.Bytes(s.RxBytes).String()),

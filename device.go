@@ -342,7 +342,7 @@ type GenericDevice struct {
 	RxBytes             int            `json:"rx_bytes"`
 	Serial              string
 	SiteID              string `json:"site_id"`
-	State               int
+	State               DevState
 	SysStats            SysStats `json:"sys_stats"` // Seems to be the replacement of system-stats
 	TxBytes             int      `json:"tx_bytes"`
 	UpgradeToFirmware   string   `json:"upgrade_to_firmware"` // Optional field, only available if Upgradeable = True
@@ -507,54 +507,29 @@ func (s USW) DeviceName() string {
 	return s.Mac
 }
 
-const DISCONNECTED = 0
-const CONNECTED = 1
-const PENDING = 2
-const DISCONNECTING = 3
-const UPGRADING = 4
-const PROVISIONING = 5
-const HEARTBEATMISSING = 6
-const ADOPTING = 7
-const DELETING = 8
-const MANAGEDBYOTHERS = 9
-const ADOPTIONFAILED = 10
-const ISOLATED = 11
-const ISOLATIONPENDING = 12
-const ADOPTINGWIRELESS = 13
+type DevState int
 
-var status = map[int]string{
-	0:  "Disconnected",
-	1:  "Connected",
-	2:  "Pending",
-	3:  "Disconnecting", // ?
-	4:  "Upgrading",
-	5:  "Provisioning",
-	6:  "Heartbeat Missing",
-	7:  "Adoping",
-	8:  "Deleting",
-	9:  "Managed By Others",
-	10: "Adoption Failed",
-	11: "Isolated",
-	12: "Isolate Pending",
-	13: "Adopting (Wireless)",
-}
+//go:generate stringer -type=DevState
 
-func (a UAP) Status() string {
-	if s, ok := status[a.State]; ok {
-		return s
-	}
-	return "unknown"
-}
+const (
+	Disconnected     DevState = 0
+	Connected        DevState = 1
+	Pending          DevState = 2
+	Disconnecting    DevState = 3
+	Upgrading        DevState = 4
+	Provisioning     DevState = 5
+	HeartbeatMissing DevState = 6
+	Adopting         DevState = 7
+	Deleting         DevState = 8
+	ManagedByOthers  DevState = 9
+	AdoptionFailed   DevState = 10
+	Isolated         DevState = 11
+	IsolationPending DevState = 12
+	AdoptingWireless DevState = 13
+)
 
 func (a UAP) SetU(u *Unifi) {
 	if u != nil {
 		a.u = u
 	}
-}
-
-func (s USW) Status() string {
-	if v, ok := status[s.State]; ok {
-		return v
-	}
-	return "unknown"
 }
