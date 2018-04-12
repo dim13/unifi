@@ -348,7 +348,7 @@ type GenericDevice struct {
 	UpgradeToFirmware   string   `json:"upgrade_to_firmware"` // Optional field, only available if Upgradeable = True
 	Uplink              Uplink
 	Uptime              int64
-	_Uptime             int `json:_uptime` // Uptime value of system-stats, different than uptime
+	_                   int `json:_uptime` // Uptime value of system-stats, different than uptime
 	Version             string
 	Type                string `json:"type"`
 }
@@ -430,7 +430,7 @@ type UAP struct {
 	XAuthkey          string       `json:"x_authkey"`
 	XFingerprint      string       `json:"x_fingerprint"`
 	XVwirekey         string       `json:"x_vwirekey"`
-	_Id               string       `json:"_id"`
+	_                 string       `json:"_id"`
 }
 
 type UAPmap map[string]UAP
