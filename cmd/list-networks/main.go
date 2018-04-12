@@ -52,8 +52,10 @@ func main() {
 		}
 		sites = append(sites, *site)
 	} else {
-
 		sites, err = u.Sites()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	for _, s := range sites {
