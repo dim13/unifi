@@ -2,7 +2,8 @@
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// list devices
+// Example command list-devices
+// List devices of a given site
 package main
 
 import (
@@ -23,7 +24,7 @@ var (
 	pass    = flag.String("pass", "unifi", "Controller password")
 	port    = flag.String("port", "8443", "Controller port")
 	version = flag.Int("version", 5, "Controller base version")
-	siteid  = flag.String("siteid", "default", "Site ID, UniFi v3 only")
+	siteid  = flag.String("siteid", "default", "Sitename or description")
 )
 
 func main() {
@@ -39,7 +40,12 @@ func main() {
 	}
 	defer u.Logout()
 
-	devices, err := u.Devices()
+	site, err := u.Site(*siteid)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	devices, err := u.Devices(site)
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -2,7 +2,8 @@
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// list associated stations
+// Example command list-clients
+// list associated clients (stations) of a given site
 package main
 
 import (
@@ -13,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"text/tabwriter"
+	"time"
 
 	"github.com/dim13/unifi"
 )
@@ -23,7 +25,7 @@ var (
 	pass    = flag.String("pass", "unifi", "Controller password")
 	version = flag.Int("version", 5, "Controller base version")
 	port    = flag.String("port", "8443", "Controller port")
-	siteid  = flag.String("siteid", "default", "Site ID, UniFi v3 only")
+	siteid  = flag.String("siteid", "default", "Sitename or description")
 )
 
 func main() {
@@ -38,23 +40,27 @@ func main() {
 	}
 	defer u.Logout()
 
-	aps, err := u.DeviceMap()
+	site, err := u.Site(*siteid)
 	if err != nil {
 		log.Fatal(err)
 	}
-	sta, err := u.Sta()
+
+	aps, err := u.DeviceMap(site)
+	if err != nil {
+		log.Fatal(err)
+	}
+	sta, err := u.Sta(site)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Output headline
-	fmt.Fprintln(w, "Name\tIsWired\tRadio\tChannel\tESSID\tRoamCount\tSignal\tNoise\tRSSI\tDevicename\tIP\tModelName")
+	fmt.Fprintln(w, "Name\tIsWired\tRadio\tChannel\tESSID\tRoamCount\tSignal\tNoise\tRSSI\tDevicename\tIP\tFirstSeen\tLastSeen\tUptime")
 
 	for _, s := range sta {
 
 		deviceMac := ""
 		deviceName := ""
-		modelName := ""
 
 		if s.ApMac != "" {
 			deviceMac = s.ApMac
@@ -67,11 +73,9 @@ func main() {
 		switch v := d.(type) {
 		case unifi.UAP:
 			deviceName = v.DeviceName()
-			modelName = v.ModelName()
 
 		case unifi.USW:
 			deviceName = v.DeviceName()
-			modelName = v.ModelName()
 		}
 
 		p := []string{
@@ -86,7 +90,9 @@ func main() {
 			strconv.Itoa(s.Rssi),
 			deviceName,
 			s.IP,
-			modelName,
+			time.Unix(s.FirstSeen, 0).Format("2006-01-02 15:04:05"),
+			time.Unix(s.LastSeen, 0).Format("2006-01-02 15:04:05"),
+			(time.Duration(s.Uptime) * time.Second).String(),
 		}
 		fmt.Fprintln(w, strings.Join(p, "\t"))
 

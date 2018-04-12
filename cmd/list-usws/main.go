@@ -1,9 +1,9 @@
-// Copyright (c) 2014 Dimitri Sokolyuk. All rights reserved.
+// Copyright (c) 2014 The unifi Authors. All rights reserved.
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-//Example of creating a new voucher, the return value - create time of the voucher
-
+// Example command list-usws
+// List USWs of a given site
 package main
 
 import (
@@ -11,18 +11,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"text/tabwriter"
-	"time"
 
 	"github.com/dim13/unifi"
 )
 
 var (
-	num    = flag.String("num", "1", "The number of the new vouchers")
-	multi  = flag.String("multi", "0", "If 0 is the multi-voucher")
-	minute = flag.String("minute", "1440", "Duration of the voucher in minutes")
-	note   = flag.String("note", "", "Note of the voucher")
-
 	host    = flag.String("host", "unifi", "Controller hostname")
 	user    = flag.String("user", "admin", "Controller username")
 	pass    = flag.String("pass", "unifi", "Controller password")
@@ -40,7 +36,8 @@ func main() {
 
 	u, err := unifi.Login(*user, *pass, *host, *port, *siteid, *version)
 	if err != nil {
-		log.Fatal("Login returned error: ", err)
+		log.Fatalln("Login returned error: ", err)
+		return
 	}
 	defer u.Logout()
 
@@ -49,22 +46,27 @@ func main() {
 		log.Fatal(err)
 	}
 
-	jsonData := unifi.NewVoucher{
-		Cmd:          "create-voucher",
-		Expire:       "custom",
-		ExpireNumber: *minute,
-		ExpireUnit:   "1",
-		N:            *num,
-		Note:         *note,
-		Quota:        *multi,
-	}
-
-	res, err := u.NewVoucher(site, jsonData)
+	aps, err := u.USWs(site)
 	if err != nil {
 		log.Fatalln(err)
+		return
 	}
 
-	ct := time.Unix(int64(res[0].CreateTime), 0).Format("2006-01-02 15:04:05")
-	fmt.Println(ct)
+	// Output headline
+	fmt.Fprintln(w, "DeviceName\tIP\tMac\tModelName\tVersion\tStatus\tNumberOfClients\tTxBytes\tRxBytes")
 
+	for _, s := range aps {
+		p := []string{
+			s.DeviceName(), // Serial if not specified
+			s.IP,
+			s.Mac,
+			s.ModelName(),
+			s.Version,
+			s.Status(),
+			strconv.Itoa(s.NumSta),
+			strings.TrimSpace(unifi.Bytes(s.TxBytes).String()),
+			strings.TrimSpace(unifi.Bytes(s.RxBytes).String()),
+		}
+		fmt.Fprintln(w, strings.Join(p, "\t"))
+	}
 }

@@ -1,8 +1,9 @@
-// Copyright (c) 2014 Dimitri Sokolyuk. All rights reserved.
+// Copyright (c) 2014 The unifi Authors. All rights reserved.
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// log stations as they roams
+// Example command log-roaming
+// log stations of a given site as they roam
 package main
 
 import (
@@ -33,7 +34,7 @@ var (
 	pass    = flag.String("pass", "unifi", "Controller password")
 	version = flag.Int("version", 5, "Controller base version")
 	port    = flag.String("port", "8443", "Controller port")
-	siteid  = flag.String("siteid", "default", "Site ID, UniFi v3 only")
+	siteid  = flag.String("siteid", "default", "Sitename or description")
 	delay   = flag.Duration("delay", 5*time.Second, "delay")
 )
 
@@ -45,7 +46,13 @@ func main() {
 	}
 
 	defer u.Logout()
-	apsmap, err := u.ApsMap()
+
+	site, err := u.Site(*siteid)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	apsmap, err := u.ApsMap(site)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,7 +68,7 @@ func main() {
 	defer ticker.Stop()
 	for range ticker.C {
 		newmap := make(roamMap)
-		sta, err := u.Sta()
+		sta, err := u.Sta(site)
 		if err != nil {
 			continue
 		}

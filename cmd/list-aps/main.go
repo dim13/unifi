@@ -2,7 +2,8 @@
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// list associated stations
+// Example command list-aps
+// List APs of a given site
 package main
 
 import (
@@ -23,7 +24,7 @@ var (
 	pass    = flag.String("pass", "unifi", "Controller password")
 	version = flag.Int("version", 5, "Controller base version")
 	port    = flag.String("port", "8443", "Controller port")
-	siteid  = flag.String("siteid", "default", "Site ID, UniFi v3 only")
+	siteid  = flag.String("siteid", "default", "Sitename or description")
 )
 
 func main() {
@@ -40,7 +41,12 @@ func main() {
 	}
 	defer u.Logout()
 
-	aps, err := u.Aps()
+	site, err := u.Site(*siteid)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	aps, err := u.Aps(site)
 	if err != nil {
 		log.Fatalln(err)
 		return
