@@ -45,7 +45,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	aps, err := u.DeviceMap(site)
+	devices, err := u.DeviceMap(site)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,7 +60,6 @@ func main() {
 	for _, s := range sta {
 
 		deviceMac := ""
-		deviceName := ""
 
 		if s.ApMac != "" {
 			deviceMac = s.ApMac
@@ -68,15 +67,7 @@ func main() {
 			deviceMac = s.SwMac
 		}
 
-		d := aps[deviceMac]
-
-		switch v := d.(type) {
-		case unifi.UAP:
-			deviceName = v.DeviceName()
-
-		case unifi.USW:
-			deviceName = v.DeviceName()
-		}
+		deviceName := devices[deviceMac].DeviceName()
 
 		p := []string{
 			s.Name(),

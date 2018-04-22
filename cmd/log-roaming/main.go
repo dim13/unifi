@@ -52,7 +52,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	apsmap, err := u.ApsMap(site)
+	apsmap, err := u.UAPMap(site)
 	if err != nil {
 		log.Fatal(err)
 	}

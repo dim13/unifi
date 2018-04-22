@@ -2,17 +2,17 @@
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// Example command list-aps
-// List APs of a given site
+// Example command list-rawdevices
+// Generates a json file with a list of devices as received by the controller api.
+// Optionally devices can be filtered by device type
 package main
 
 import (
+	"encoding/json"
 	"flag"
-	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
-	"strconv"
-	"strings"
 	"text/tabwriter"
 
 	"github.com/dim13/unifi"
@@ -22,22 +22,24 @@ var (
 	host    = flag.String("host", "unifi", "Controller hostname")
 	user    = flag.String("user", "admin", "Controller username")
 	pass    = flag.String("pass", "unifi", "Controller password")
-	version = flag.Int("version", 5, "Controller base version")
 	port    = flag.String("port", "8443", "Controller port")
+	version = flag.Int("version", 5, "Controller base version")
 	siteid  = flag.String("siteid", "default", "Sitename or description")
+
+	filter = flag.String("filter", "", "Filter by device type [uap|usw|ugw]")
+	path   = flag.String("path", "./rawDevices.json", "The path and filename of the output")
 )
 
 func main() {
+	flag.Parse()
+
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 3, ' ', 0)
 	defer w.Flush()
 
-	flag.Parse()
-
 	u, err := unifi.Login(*user, *pass, *host, *port, *siteid, *version)
 	if err != nil {
 		log.Fatalln("Login returned error: ", err)
-		return
 	}
 	defer u.Logout()
 
@@ -46,27 +48,21 @@ func main() {
 		log.Fatal(err)
 	}
 
-	aps, err := u.Aps(site)
+	rawDevices, err := u.RawDevices(site, *filter)
 	if err != nil {
 		log.Fatalln(err)
-		return
 	}
 
-	// Output headline
-	fmt.Fprintln(w, "DeviceName\tIP\tMac\tModelName\tVersion\tStatus\tNumberOfClients\tTxBytes\tRxBytes")
+	var devices []json.RawMessage
 
-	for _, s := range aps {
-		p := []string{
-			s.DeviceName(), // Serial if not specified
-			s.IP,
-			s.Mac,
-			s.ModelName(),
-			s.Version,
-			s.State.String(),
-			strconv.Itoa(s.NumSta),
-			strings.TrimSpace(unifi.Bytes(s.TxBytes).String()),
-			strings.TrimSpace(unifi.Bytes(s.RxBytes).String()),
-		}
-		fmt.Fprintln(w, strings.Join(p, "\t"))
+	for i, _ := range rawDevices {
+		devices = append(devices, rawDevices[i].Data)
+	}
+
+	json, _ := json.MarshalIndent(devices, "", "  ")
+	err = ioutil.WriteFile(*path, json, 0644)
+	if err != nil {
+		log.Fatalln(err)
+
 	}
 }

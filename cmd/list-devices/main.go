@@ -25,6 +25,7 @@ var (
 	port    = flag.String("port", "8443", "Controller port")
 	version = flag.Int("version", 5, "Controller base version")
 	siteid  = flag.String("siteid", "default", "Sitename or description")
+	filter  = flag.String("filter", "", "Device Filter [uap|usw|ugw]")
 )
 
 func main() {
@@ -45,59 +46,49 @@ func main() {
 		log.Fatal(err)
 	}
 
-	devices, err := u.Devices(site)
+	devices, err := u.Devices(site, *filter)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	var numberOfAps, numberOfSwitches, numberOfDevices int
+	var numberOfUAPs, numberOfUSWs, numberOfUGWs, numberOfDevices int
 
 	// Output headline
 	fmt.Fprintln(w, "Type\tName\tIP\tMac\tModelName\tVersion\tStatus\tNumberOfClients\tTxBytes\tRxBytes")
 
 	for _, d := range devices {
-		switch dev := d.(type) {
-		case unifi.UAP:
-			p := []string{
-				"AP    ",
-				dev.DeviceName(),
-				dev.IP,
-				dev.Mac,
-				dev.ModelName(),
-				dev.Version,
-				dev.State.String(),
-				strconv.Itoa(dev.NumSta),
-				unifi.Bytes(dev.TxBytes).String(),
-				unifi.Bytes(dev.RxBytes).String(),
-			}
-			fmt.Fprintln(w, strings.Join(p, "\t"))
-			numberOfAps++
-
-		case unifi.USW:
-			p := []string{
-				"Switch",
-				dev.DeviceName(),
-				dev.IP,
-				dev.Mac,
-				dev.ModelName(),
-				dev.Version,
-				dev.State.String(),
-				strconv.Itoa(dev.NumSta),
-				unifi.Bytes(dev.TxBytes).String(),
-				unifi.Bytes(dev.RxBytes).String(),
-			}
-			fmt.Fprintln(w, strings.Join(p, "\t"))
-			numberOfSwitches++
-
+		p := []string{
+			d.Type,
+			d.DeviceName(),
+			d.IP,
+			d.Mac,
+			d.ModelName(),
+			d.Version,
+			d.State.String(),
+			strconv.Itoa(d.NumSta),
+			unifi.Bytes(d.TxBytes).String(),
+			unifi.Bytes(d.RxBytes).String(),
 		}
+		fmt.Fprintln(w, strings.Join(p, "\t"))
+
+		switch d.Type {
+		case "uap":
+			numberOfUAPs++
+		case "usw":
+			numberOfUSWs++
+		case "ugw":
+			numberOfUGWs++
+		}
+
 		numberOfDevices++
 
 	}
 
 	w.Flush() // Write
 	fmt.Printf("\n")
-	fmt.Printf("Number of APs     : %d\n", numberOfAps)
-	fmt.Printf("Number of Switches: %d\n", numberOfSwitches)
+	fmt.Printf("Number of APs     : %d\n", numberOfUAPs)
+	fmt.Printf("Number of Switches: %d\n", numberOfUSWs)
+	fmt.Printf("Number of Gateways: %d\n", numberOfUGWs)
 	fmt.Printf("Total             : %d\n", numberOfDevices)
 
 }

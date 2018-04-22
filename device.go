@@ -4,6 +4,12 @@
 
 package unifi
 
+import (
+	"encoding/json"
+	"fmt"
+	"time"
+)
+
 type ConfigNetwork struct {
 	IP   string
 	Type string
@@ -14,7 +20,7 @@ type DownlinkTable struct {
 }
 
 type Port struct {
-	AggregatedBy   bool `json:"aggregated_by"`
+	AggregatedBy   interface{} `json:"aggregated_by"` // FIXME: type false or int (5.6.22)
 	Autoneg        bool
 	BytesR         int64  `json:"bytes-r"`
 	Dot1xMode      string `json:"dot1x_mode"`
@@ -73,82 +79,33 @@ type Port struct {
 	Up             bool
 }
 
-type RadioTable struct {
-	AntennaGain    int  `json:"-"` // FIXME: buggy input, sometimes string and sometimes int
-	BuiltinAntGain int  `json:"builtin_ant_gain"`
-	BuiltinAntenna bool `json:"builtin_antenna"`
-	Channel        string
-	Ht             string
-	MaxTxpower     int `json:"max_txpower"`
-	Mode           string
-	Name           string
-	Radio          string
-	TxPower        string `json:"tx_power"`
-	TxPowerMode    string `json:"tx_power_mode"`
-}
-
+// Unifi API Version 5.7.20
 type Uplink struct {
-	FullDuplex       bool `json:"full_duplex"`
-	IP               string
-	LagMember        bool `json:"lag_member"`
-	Mac              string
-	MaxSpeed         int64 `json:"max_speed"`
-	Name             string
-	Netmask          string
-	NumPort          int64 `json:"num_port"`
-	RxBytes          int64 `json:"rx_bytes"`
-	RxBytesR         int64 `json:"rx_bytes.r"`
-	RxDropped        int64 `json:"rx_dropped"`
-	RxErrors         int64 `json:"rx_errors"`
-	RxMulticast      int64 `json:"rx_multicast"`
-	RxPackets        int64 `json:"rx_packets"`
-	Speed            int
-	TxBytes          int64 `json:"tx_bytes"`
-	TxDropped        int64 `json:"tx_dropped"`
-	TxErrors         int64 `json:"tx_errors"`
-	TxPackets        int64 `json:"tx_packets"`
-	Type             string
-	Up               bool
-	UplinkMac        string `json:"uplink_mac"`
-	UplinkRemotePort int64  `json:"uplink_remote_port"`
+	FullDuplex  bool   `json:"full_duplex"`
+	IP          string `json:"ip"`
+	Mac         string `json:"mac"`
+	MaxSpeed    int    `json:"max_speed"`
+	Name        string `json:"name"`
+	Netmask     string `json:"netmask"`
+	NumPort     int    `json:"num_port"`
+	RxBytes     int64  `json:"rx_bytes"`
+	RxBytesR    int    `json:"rx_bytes-r"`
+	RxDropped   int    `json:"rx_dropped"`
+	RxErrors    int    `json:"rx_errors"`
+	RxMulticast int    `json:"rx_multicast"`
+	RxPackets   int    `json:"rx_packets"`
+	Speed       int    `json:"speed"`
+	TxBytes     int64  `json:"tx_bytes"`
+	TxBytesR    int    `json:"tx_bytes-r"`
+	TxDropped   int    `json:"tx_dropped"`
+	TxErrors    int    `json:"tx_errors"`
+	TxPackets   int    `json:"tx_packets"`
+	Type        string `json:"type"`
+	Up          bool   `json:"up"`
 }
 
 type UplinkTable struct {
 	/* FIXME */
-}
-
-type VapTable struct {
-	ApMac      string `json:"ap_mac"`
-	Bssid      string
-	Ccq        int
-	Channel    int
-	Essid      string
-	ID         string
-	IsGuest    bool   `json:"is_guest"`
-	IsWep      bool   `json:"is_wep"`
-	MapID      string `json:"map_id"`
-	Name       string
-	NumSta     int `json:"num_sta"`
-	Radio      string
-	RxBytes    int        `json:"rx_bytes"`
-	RxCrypts   int        `json:"rx_crypts"`
-	RxDropped  int        `json:"rx_dropped"`
-	RxErrors   int        `json:"rx_errors"`
-	RxFrags    int        `json:"rx_frags"`
-	RxNwids    int        `json:"rx_nwids"`
-	RxPackets  int        `json:"rx_packets"`
-	StaTable   []StaTable `json:"sta_table"`
-	State      string
-	T          string
-	TxBytes    int `json:"tx_bytes"`
-	TxDropped  int `json:"tx_dropped"`
-	TxErrors   int `json:"tx_errors"`
-	TxPackets  int `json:"tx_packets"`
-	TxPower    int `json:"tx_power"`
-	TxRetries  int `json:"tx_retries"`
-	Up         bool
-	Usage      string
-	WlanconfID string `json:"wlanconf_id"`
 }
 
 type StaTable struct {
@@ -183,7 +140,7 @@ type VwireTable struct {
 	/* FIXME */
 }
 
-type EthernetTable struct {
+type Ethernet struct {
 	Mac     string
 	Name    string
 	NumPort *int `json:"num_port"` // Pointer to check if absent
@@ -227,74 +184,101 @@ type PortOverride struct {
 	StormcontrolUcastRate    *int   `json:"stormctrl_ucast_rate,omitempty"`
 }
 
+// API version 5.7.20
 type Stat struct {
-	Ap    string
-	Bytes int
-	/*
-		Na-numSta  int	`json:"na-num_sta"`
-		Na-rxBytes  int	`json:"na-rx_bytes"`
-		Na-rxFrags  int	`json:"na-rx_frags"`
-		Na-rxPackets  int	`json:"na-rx_packets"`
-		Na-timeDelta  int	`json:"na-time_delta"`
-		Na-txBytes  int	`json:"na-tx_bytes"`
-		Na-txErrors  int	`json:"na-tx_errors"`
-		Na-txPackets  int	`json:"na-tx_packets"`
-		Na-txRetries  int	`json:"na-tx_retries"`
-		Ng-numSta  int	`json:"ng-num_sta"`
-		Ng-rxBytes  int	`json:"ng-rx_bytes"`
-		Ng-rxFrags  int	`json:"ng-rx_frags"`
-		Ng-rxPackets  int	`json:"ng-rx_packets"`
-		Ng-timeDelta  int	`json:"ng-time_delta"`
-		Ng-txBytes  int	`json:"ng-tx_bytes"`
-		Ng-txErrors  int	`json:"ng-tx_errors"`
-		Ng-txPackets  int	`json:"ng-tx_packets"`
-		Ng-txRetries  int	`json:"ng-tx_retries"`
-	*/
-	NumSta    int `json:"num_sta"`
-	O         string
-	RxBytes   int `json:"rx_bytes"`
-	RxFrags   int `json:"rx_frags"`
-	RxPackets int `json:"rx_packets"`
-	TimeDelta int `json:"time_delta"`
-	TxBytes   int `json:"tx_bytes"`
-	TxErrors  int `json:"tx_errors"`
-	TxPackets int `json:"tx_packets"`
-	TxRetries int `json:"tx_retries"`
-	Type      string
-	/*
-		Uplink-rxBytes  int	`json:"uplink-rx_bytes"`
-		Uplink-rxPackets  int	`json:"uplink-rx_packets"`
-		Uplink-timeDelta  int	`json:"uplink-time_delta"`
-		Uplink-txBytes  int	`json:"uplink-tx_bytes"`
-		Uplink-txPackets  int	`json:"uplink-tx_packets"`
-		User-na-numSta  int	`json:"user-na-num_sta"`
-		User-na-rxBytes  int	`json:"user-na-rx_bytes"`
-		User-na-rxFrags  int	`json:"user-na-rx_frags"`
-		User-na-rxPackets  int	`json:"user-na-rx_packets"`
-		User-na-timeDelta  int	`json:"user-na-time_delta"`
-		User-na-txBytes  int	`json:"user-na-tx_bytes"`
-		User-na-txErrors  int	`json:"user-na-tx_errors"`
-		User-na-txPackets  int	`json:"user-na-tx_packets"`
-		User-na-txRetries  int	`json:"user-na-tx_retries"`
-		User-ng-numSta  int	`json:"user-ng-num_sta"`
-		User-ng-rxBytes  int	`json:"user-ng-rx_bytes"`
-		User-ng-rxFrags  int	`json:"user-ng-rx_frags"`
-		User-ng-rxPackets  int	`json:"user-ng-rx_packets"`
-		User-ng-timeDelta  int	`json:"user-ng-time_delta"`
-		User-ng-txBytes  int	`json:"user-ng-tx_bytes"`
-		User-ng-txErrors  int	`json:"user-ng-tx_errors"`
-		User-ng-txPackets  int	`json:"user-ng-tx_packets"`
-		User-ng-txRetries  int	`json:"user-ng-tx_retries"`
-		User-numSta  int	`json:"user-num_sta"`
-		User-rxBytes  int	`json:"user-rx_bytes"`
-		User-rxFrags  int	`json:"user-rx_frags"`
-		User-rxPackets  int	`json:"user-rx_packets"`
-		User-timeDelta  int	`json:"user-time_delta"`
-		User-txBytes  int	`json:"user-tx_bytes"`
-		User-txErrors  int	`json:"user-tx_errors"`
-		User-txPackets  int	`json:"user-tx_packets"`
-		User-txRetries  int	`json:"user-tx_retries"`
-	*/
+	Ap                                             string    `json:"ap"`
+	Bytes                                          float64   `json:"bytes"`
+	Datetime                                       time.Time `json:"datetime"`
+	Duration                                       float64   `json:"duration"`
+	GuestRxBytes                                   float64   `json:"guest-rx_bytes"`
+	GuestRxCrypts                                  float64   `json:"guest-rx_crypts"`
+	GuestRxDropped                                 float64   `json:"guest-rx_dropped"`
+	GuestRxErrors                                  float64   `json:"guest-rx_errors"`
+	GuestRxFrags                                   float64   `json:"guest-rx_frags"`
+	GuestRxPackets                                 float64   `json:"guest-rx_packets"`
+	GuestTxBytes                                   float64   `json:"guest-tx_bytes"`
+	GuestTxDropped                                 float64   `json:"guest-tx_dropped"`
+	GuestTxErrors                                  float64   `json:"guest-tx_errors"`
+	GuestTxPackets                                 float64   `json:"guest-tx_packets"`
+	GuestTxRetries                                 float64   `json:"guest-tx_retries"`
+	O                                              string    `json:"o"`
+	Oid                                            string    `json:"oid"`
+	RxBytes                                        float64   `json:"rx_bytes"`
+	RxCrypts                                       float64   `json:"rx_crypts"`
+	RxDropped                                      float64   `json:"rx_dropped"`
+	RxErrors                                       float64   `json:"rx_errors"`
+	RxFrags                                        float64   `json:"rx_frags"`
+	RxPackets                                      float64   `json:"rx_packets"`
+	SiteID                                         string    `json:"site_id"`
+	Time                                           int64     `json:"time"`
+	TxBytes                                        float64   `json:"tx_bytes"`
+	TxDropped                                      float64   `json:"tx_dropped"`
+	TxErrors                                       float64   `json:"tx_errors"`
+	TxPackets                                      float64   `json:"tx_packets"`
+	TxRetries                                      float64   `json:"tx_retries"`
+	UserRxBytes                                    float64   `json:"user-rx_bytes"`
+	UserRxCrypts                                   float64   `json:"user-rx_crypts"`
+	UserRxDropped                                  float64   `json:"user-rx_dropped"`
+	UserRxErrors                                   float64   `json:"user-rx_errors"`
+	UserRxFrags                                    float64   `json:"user-rx_frags"`
+	UserRxPackets                                  float64   `json:"user-rx_packets"`
+	UserTxBytes                                    float64   `json:"user-tx_bytes"`
+	UserTxDropped                                  float64   `json:"user-tx_dropped"`
+	UserTxErrors                                   float64   `json:"user-tx_errors"`
+	UserTxPackets                                  float64   `json:"user-tx_packets"`
+	UserTxRetries                                  float64   `json:"user-tx_retries"`
+	UserWifi0Ath05Aa99001C9E77C011Dc149F7RxBytes   float64   `json:"user-wifi0-ath0-5aa99001c9e77c011dc149f7-rx_bytes"`
+	UserWifi0Ath05Aa99001C9E77C011Dc149F7RxPackets float64   `json:"user-wifi0-ath0-5aa99001c9e77c011dc149f7-rx_packets"`
+	UserWifi0Ath05Aa99001C9E77C011Dc149F7TxBytes   float64   `json:"user-wifi0-ath0-5aa99001c9e77c011dc149f7-tx_bytes"`
+	UserWifi0Ath05Aa99001C9E77C011Dc149F7TxPackets float64   `json:"user-wifi0-ath0-5aa99001c9e77c011dc149f7-tx_packets"`
+	UserWifi0RxBytes                               float64   `json:"user-wifi0-rx_bytes"`
+	UserWifi0RxCrypts                              float64   `json:"user-wifi0-rx_crypts"`
+	UserWifi0RxDropped                             float64   `json:"user-wifi0-rx_dropped"`
+	UserWifi0RxErrors                              float64   `json:"user-wifi0-rx_errors"`
+	UserWifi0RxFrags                               float64   `json:"user-wifi0-rx_frags"`
+	UserWifi0RxPackets                             float64   `json:"user-wifi0-rx_packets"`
+	UserWifi0TxBytes                               float64   `json:"user-wifi0-tx_bytes"`
+	UserWifi0TxDropped                             float64   `json:"user-wifi0-tx_dropped"`
+	UserWifi0TxErrors                              float64   `json:"user-wifi0-tx_errors"`
+	UserWifi0TxPackets                             float64   `json:"user-wifi0-tx_packets"`
+	UserWifi0TxRetries                             float64   `json:"user-wifi0-tx_retries"`
+	UserWifi1Ath2NullRxBytes                       float64   `json:"user-wifi1-ath2-null-rx_bytes"`
+	UserWifi1Ath2NullRxPackets                     float64   `json:"user-wifi1-ath2-null-rx_packets"`
+	UserWifi1Ath2NullTxBytes                       float64   `json:"user-wifi1-ath2-null-tx_bytes"`
+	UserWifi1Ath2NullTxPackets                     float64   `json:"user-wifi1-ath2-null-tx_packets"`
+	UserWifi1RxBytes                               float64   `json:"user-wifi1-rx_bytes"`
+	UserWifi1RxCrypts                              float64   `json:"user-wifi1-rx_crypts"`
+	UserWifi1RxDropped                             float64   `json:"user-wifi1-rx_dropped"`
+	UserWifi1RxErrors                              float64   `json:"user-wifi1-rx_errors"`
+	UserWifi1RxFrags                               float64   `json:"user-wifi1-rx_frags"`
+	UserWifi1RxPackets                             float64   `json:"user-wifi1-rx_packets"`
+	UserWifi1TxBytes                               float64   `json:"user-wifi1-tx_bytes"`
+	UserWifi1TxDropped                             float64   `json:"user-wifi1-tx_dropped"`
+	UserWifi1TxErrors                              float64   `json:"user-wifi1-tx_errors"`
+	UserWifi1TxPackets                             float64   `json:"user-wifi1-tx_packets"`
+	UserWifi1TxRetries                             float64   `json:"user-wifi1-tx_retries"`
+	Wifi0RxBytes                                   float64   `json:"wifi0-rx_bytes"`
+	Wifi0RxCrypts                                  float64   `json:"wifi0-rx_crypts"`
+	Wifi0RxDropped                                 float64   `json:"wifi0-rx_dropped"`
+	Wifi0RxErrors                                  float64   `json:"wifi0-rx_errors"`
+	Wifi0RxFrags                                   float64   `json:"wifi0-rx_frags"`
+	Wifi0RxPackets                                 float64   `json:"wifi0-rx_packets"`
+	Wifi0TxBytes                                   float64   `json:"wifi0-tx_bytes"`
+	Wifi0TxDropped                                 float64   `json:"wifi0-tx_dropped"`
+	Wifi0TxErrors                                  float64   `json:"wifi0-tx_errors"`
+	Wifi0TxPackets                                 float64   `json:"wifi0-tx_packets"`
+	Wifi0TxRetries                                 float64   `json:"wifi0-tx_retries"`
+	Wifi1RxBytes                                   float64   `json:"wifi1-rx_bytes"`
+	Wifi1RxCrypts                                  float64   `json:"wifi1-rx_crypts"`
+	Wifi1RxDropped                                 float64   `json:"wifi1-rx_dropped"`
+	Wifi1RxErrors                                  float64   `json:"wifi1-rx_errors"`
+	Wifi1RxFrags                                   float64   `json:"wifi1-rx_frags"`
+	Wifi1RxPackets                                 float64   `json:"wifi1-rx_packets"`
+	Wifi1TxBytes                                   float64   `json:"wifi1-tx_bytes"`
+	Wifi1TxDropped                                 float64   `json:"wifi1-tx_dropped"`
+	Wifi1TxErrors                                  float64   `json:"wifi1-tx_errors"`
+	Wifi1TxPackets                                 float64   `json:"wifi1-tx_packets"`
+	Wifi1TxRetries                                 float64   `json:"wifi1-tx_retries"`
 }
 
 type SysStats struct {
@@ -306,134 +290,355 @@ type SysStats struct {
 	MemTotal  int    `json:"mem_total"`
 }
 
-type GenericDevice struct {
-	u                  *Unifi
-	Adopted            bool
-	BoardRev           int `json:"board_rev"`
-	Bytes              int
-	Cfgversion         string
-	ConfigNetwork      ConfigNetwork `json:"config_network"`
-	ConnectRequestIP   string        `json:"connect_request_ip"`
-	ConnectRequestPort string        `json:"connect_request_port"`
-	ConsideredLostAt   int           `json:"considered_lost_at"`
-	// DHCPServerTable  // TODO
-	DeviceID            string `json:"device_id"`
-	Disabled            bool
-	DownlinkTable       []DownlinkTable `json:"downlink_table"`
-	FwCaps              int             `json:"fw_caps"`
-	GuestNumSta         int             `json:"guest-num_sta"`
-	InformURL           string          `json:"inform_url"`
-	InformIP            string          `json:"inform_ip"`
-	IP                  string
-	KnownCfgversion     string `json:"known_cfgversion"`
-	LastSeen            int    `json:"last_seen"`
-	LedOverride         string `json:"led_override"`
-	LicenseState        string `json:"license_state"`
-	Locating            bool
-	Mac                 string
-	MgmtNetworkID       string `json:"mgmt_network_id"`
-	Model               string
-	Name                string
-	NextHeartbeatAt     int            `json:"next_heartbeat_at"`
-	NumSta              int            `json:"num_sta"`
-	OutdoorModeOverride string         `json:"outdoor_mode_override"`
-	PortOverrides       []PortOverride `json:"port_overrides"`
-	PortTable           []Port         `json:"port_table"`
-	RxBytes             int            `json:"rx_bytes"`
-	Serial              string
-	SiteID              string `json:"site_id"`
-	State               DevState
-	SysStats            SysStats `json:"sys_stats"` // Seems to be the replacement of system-stats
-	TxBytes             int      `json:"tx_bytes"`
-	UpgradeToFirmware   string   `json:"upgrade_to_firmware"` // Optional field, only available if Upgradeable = True
-	Uplink              Uplink
-	Uptime              int64
-	_                   int `json:_uptime` // Uptime value of system-stats, different than uptime
-	Version             string
-	Type                string `json:"type"`
+type RadioTableStats struct {
+	AstBeXmit   interface{} `json:"ast_be_xmit"`
+	AstCst      interface{} `json:"ast_cst"`
+	AstTxto     interface{} `json:"ast_txto"`
+	Channel     int         `json:"channel"`
+	CuSelfRx    int         `json:"cu_self_rx"`
+	CuSelfTx    int         `json:"cu_self_tx"`
+	CuTotal     int         `json:"cu_total"`
+	Extchannel  int         `json:"extchannel"`
+	Gain        int         `json:"gain"`
+	GuestNumSta int         `json:"guest-num_sta"`
+	Name        string      `json:"name"`
+	NumSta      int         `json:"num_sta"`
+	Radio       string      `json:"radio"`
+	State       string      `json:"state"`
+	TxPackets   int         `json:"tx_packets"`
+	TxPower     int         `json:"tx_power"`
+	TxRetries   int         `json:"tx_retries"`
+	UserNumSta  int         `json:"user-num_sta"`
 }
 
-type DeviceMap map[string]interface{}
-
-type USW struct {
-	*GenericDevice
-	Dot1PortControlEnabled bool `json:"dot1x_portctrl_enabled"`
-	//EthernetTable          EthernetTable `json:"ethernet_table"`
-	FlowctrlEnabled    bool `json:"flowctrl_enabled"`
-	FanLevel           int  `json:"fan_level"`
-	GeneralTemperature *int `json:"general_temperature"`
-	HasFan             bool `json:"has_fan"`
-	JumboframeEnabled  bool `json:"jumboframe_enabled"`
-	Overheating        bool
-	StpVersion         string `json:"stp_version"`
-	StpPriority        string `json:"stp_priority"`
+type SystemStats struct {
+	SystemStats struct {
+		CPU   string `json:"cpu"`
+		Mem   string `json:"mem"`
+		Temps struct {
+			BoardCPU string `json:"Board (CPU)"`
+			BoardPHY string `json:"Board (PHY)"`
+			CPU      string `json:"CPU"`
+			PHY      string `json:"PHY"`
+		} `json:"temps"`
+	} `json:"system-stats"`
 }
 
-type USWmap map[string]USW
+type ConfigNetworkWan struct {
+	DNS1    string `json:"dns1"`
+	DNS2    string `json:"dns2"`
+	Gateway string `json:"gateway"`
+	IP      string `json:"ip"`
+	Netmask string `json:"netmask"`
+	Type    string `json:"type"`
+}
 
-// Access point data
-type UAP struct {
-	*GenericDevice
-	// TODO Fix Fields (Generic or UAP only)
-	BytesD            int    `json:"bytes-d"`
-	BytesR            int    `json:"bytes-r"`
-	GuestToken        string `json:"guest_token"`
-	HasEth1           bool   `json:"has_eth1"`
-	HasPoePassthrough bool   `json:"has_poe_passthrough"`
-	HasSpeaker        bool   `json:"has_speaker"`
-	InformAuthkey     string `json:"inform_authkey"`
-	Isolated          bool
-	Locked            bool
-	MapID             string       `json:"map_id"`
-	NaChannel         int          `json:"na-channel"`
-	NaCuSelfRx        int          `json:"na_cu_self_rx"`
-	NaCuSelfTx        int          `json:"na_cu_self_tx"`
-	NaCuTotal         int          `"json:na-cu-total"`
-	NaAstBeXmint      int          `json:"na_ast_be_xmit"`
-	NaEirp            int          `json:"na-eirp"`
-	NaExtchannel      int          `json:"na-extchannel"`
-	NaGain            int          `json:"na-gain"`
-	NaGuestNumSta     int          `json:"na-guest-num_sta"`
-	NaNumSta          int          `json:"na-num_sta"`
-	NaState           string       `json:"na-state"`
-	NaTxPower         int          `json:"na-tx_power"`
-	NaTxRetries       int          `json:"na_tx_retries"`
-	NaTxPackets       int          `json:"na_tx_packets"`
-	NgAstBeXmit       int          `json:"ng_ast_be_xmit"`
-	NgChannel         int          `json:"ng-channel"`
-	NgCuSelfTx        int          `json:"ng_cu_self_tx"`
-	NgGuestNumSta     int          `json:"ng-guest-num_sta"`
-	NgEirp            int          `json:"ng-eirp"`
-	NgExtchannel      int          `json:"ng-extchannel"`
-	NgGain            int          `json:"ng-gain"`
-	NgNumSta          int          `json:"ng-num_sta"`
-	NgState           string       `json:"ng-state"`
-	NgTxPackets       int          `json:"ng_tx_packets"`
-	NgTxPower         int          `json:"ng-tx_power"`
-	NgUserNumSta      int          `json:"ng-user-num-sta"`
-	RadioTable        []RadioTable `json:"radio_table"`
-	Rollupgrade       bool         `json:"rollupgrade"`
-	RxBytesD          int          `json:"rx_bytes-d"`
-	Scanning          bool
-	SpectrumScanning  bool `spectrum_scanning`
-	TxBytesD          int  `json:"tx_bytes-d"`
-	Type              string
-	Upgradeable       bool
-	UplinkTable       []UplinkTable `json:"uplink_table"`
+type Wan struct {
+	BytesR      int      `json:"bytes-r"`
+	DNS         []string `json:"dns"`
+	Enable      bool     `json:"enable"`
+	FullDuplex  bool     `json:"full_duplex"`
+	Gateway     string   `json:"gateway"`
+	Ifname      string   `json:"ifname"`
+	IP          string   `json:"ip"`
+	Mac         string   `json:"mac"`
+	MaxSpeed    int      `json:"max_speed"`
+	Name        string   `json:"name"`
+	Netmask     string   `json:"netmask"`
+	RxBytes     int64    `json:"rx_bytes"`
+	RxBytesR    int      `json:"rx_bytes-r"`
+	RxDropped   int      `json:"rx_dropped"`
+	RxErrors    int      `json:"rx_errors"`
+	RxMulticast int      `json:"rx_multicast"`
+	RxPackets   int      `json:"rx_packets"`
+	Speed       int      `json:"speed"`
+	TxBytes     int64    `json:"tx_bytes"`
+	TxBytesR    int      `json:"tx_bytes-r"`
+	TxDropped   int      `json:"tx_dropped"`
+	TxErrors    int      `json:"tx_errors"`
+	TxPackets   int      `json:"tx_packets"`
+	Type        string   `json:"type"`
+	Up          bool     `json:"up"`
+}
+
+type RawDevice struct {
+	Data json.RawMessage
+	Type string
+}
+
+// Returns a slice of json RawDevices as received by the controller
+func (u *Unifi) RawDevices(site *Site, filter string) ([]RawDevice, error) {
+
+	var rawDevices []RawDevice
+
+	// Response from controller
+	var response struct {
+		Data []json.RawMessage
+		Meta meta
+	}
+	err := u.parse(site, "stat/device", &response)
+
+	for _, d := range response.Data {
+
+		// unmarshal into a map to check the "type" field
+		var obj map[string]interface{}
+		err := json.Unmarshal(d, &obj)
+		if err != nil {
+			return nil, err
+		}
+
+		deviceType, ok := obj["type"].(string)
+		if !ok {
+			return nil, fmt.Errorf("Error on retrieving object type from raw Json")
+		}
+
+		switch filter {
+		case "":
+			var rd RawDevice
+			rd.Type = deviceType
+			rd.Data = d
+			rawDevices = append(rawDevices, rd)
+		default:
+			// Filter is set. Only return devices of the given type
+			if deviceType == filter {
+				var rd RawDevice
+				rd.Type = deviceType
+				rd.Data = d
+				rawDevices = append(rawDevices, rd)
+			}
+		}
+	}
+
+	return rawDevices, err
+}
+
+type Device struct {
+	u  *Unifi
+	ID string `json:"_id"`
+	//Uptime             int           `json:"_uptime"`
+	Adopted          bool          `json:"adopted"`
+	AntennaTable     []interface{} `json:"antenna_table,omitempty"`
+	Bytes            int           `json:"bytes"`
+	BytesD           int           `json:"bytes-d,omitempty"`
+	BytesR           int           `json:"bytes-r,omitempty"`
+	Cfgversion       string        `json:"cfgversion"`
+	ConfigNetwork    ConfigNetwork `json:"config_network"`
+	ConnectRequestIP string        `json:"connect_request_ip"`
+	//ConnectRequestPort int           `json:"connect_request_port"` //FIXME: Prior to 5.7.20 type string!
+	ConsideredLostAt int           `json:"considered_lost_at"`
+	DeviceID         string        `json:"device_id"`
+	EthernetTable    []Ethernet    `json:"ethernet_table"`
+	FwCaps           int           `json:"fw_caps"`
+	GuestNumSta      int           `json:"guest-num_sta"`
+	GuestToken       string        `json:"guest_token,omitempty"`
+	HasEth1          bool          `json:"has_eth1,omitempty"`
+	HasSpeaker       bool          `json:"has_speaker,omitempty"`
+	InformIP         string        `json:"inform_ip"`
+	InformURL        string        `json:"inform_url"`
+	IP               string        `json:"ip"`
+	Isolated         bool          `json:"isolated,omitempty"`
+	KnownCfgversion  string        `json:"known_cfgversion"`
+	LastSeen         int           `json:"last_seen"`
+	LedOverride      string        `json:"led_override"`
+	LicenseState     string        `json:"license_state"`
+	Locating         bool          `json:"locating"`
+	Mac              string        `json:"mac"`
+	MapID            string        `json:"map_id,omitempty"`
+	Model            string        `json:"model"`
+	Name             string        `json:"name"`
+	NextHeartbeatAt  int           `json:"next_heartbeat_at"`
+	NumSta           int           `json:"num_sta"`
+	PortStats        []interface{} `json:"port_stats,omitempty"`
+	PortTable        []Port        `json:"port_table"`
+	RadioTable       []struct {
+		BuiltinAntGain     int    `json:"builtin_ant_gain"`
+		BuiltinAntenna     bool   `json:"builtin_antenna"`
+		CurrentAntennaGain int    `json:"current_antenna_gain"`
+		MaxTxpower         int    `json:"max_txpower"`
+		MinTxpower         int    `json:"min_txpower"`
+		Name               string `json:"name"`
+		Nss                int    `json:"nss"`
+		Radio              string `json:"radio"`
+		RadioCaps          int    `json:"radio_caps"`
+		WlangroupID        string `json:"wlangroup_id"`
+	} `json:"radio_table",omitempty`
+	RadioTableStats []struct {
+		AstBeXmit   interface{} `json:"ast_be_xmit"`
+		AstCst      interface{} `json:"ast_cst"`
+		AstTxto     interface{} `json:"ast_txto"`
+		Channel     int         `json:"channel"`
+		CuSelfRx    int         `json:"cu_self_rx"`
+		CuSelfTx    int         `json:"cu_self_tx"`
+		CuTotal     int         `json:"cu_total"`
+		Extchannel  int         `json:"extchannel"`
+		Gain        int         `json:"gain"`
+		GuestNumSta int         `json:"guest-num_sta"`
+		Name        string      `json:"name"`
+		NumSta      int         `json:"num_sta"`
+		Radio       string      `json:"radio"`
+		State       string      `json:"state"`
+		TxPackets   int         `json:"tx_packets"`
+		TxPower     int         `json:"tx_power"`
+		TxRetries   int         `json:"tx_retries"`
+		UserNumSta  int         `json:"user-num_sta"`
+	} `json:"radio_table_stats",omitempty`
+	RxBytes           int           `json:"rx_bytes"`
+	RxBytesD          int           `json:"rx_bytes-d,omitempty"`
+	ScanRadioTable    []interface{} `json:"scan_radio_table,omitempty"`
+	Scanning          bool          `json:"scanning,omitempty"`
+	Serial            string        `json:"serial"`
+	SiteID            string        `json:"site_id"`
+	SpectrumScanning  bool          `json:"spectrum_scanning,omitempty"`
+	SSHSessionTable   []interface{} `json:"ssh_session_table,omitempty"`
+	Stat              Stat          `json:"stat"`
+	State             DevState      `json:"state"`
+	SysStats          SysStats      `json:"sys_stats"`
+	SystemStats       SystemStats   `json:"system-stats"`
+	TxBytes           int           `json:"tx_bytes"`
+	TxBytesD          int           `json:"tx_bytes-d,omitempty"`
+	Type              string        `json:"type"`
+	Upgradable        bool          `json:"upgradable"`
+	UpgradeState      int           `json:"upgrade_state"`
+	UpgradeToFirmware string        `json:"upgrade_to_firmware"`
+	Uplink            Uplink        `json:"uplink"`
+	UplinkTable       []interface{} `json:"uplink_table,omitempty"`
+	Uptime            int           `json:"uptime"`
 	UserNumSta        int           `json:"user-num_sta"`
-	VapTable          []VapTable    `json:"vap_table"`
-	VwireEnabled      bool
-	VwireTable        []VwireTable `json:"vwire_table"`
-	WifiCaps          int          `json:"wifi_caps"`
-	WlanGroupIDNa     string       `json:"wlangroup_id_na"`
-	WlanGroupIDNg     string       `json:"wlangroup_id_ng"`
-	XAuthkey          string       `json:"x_authkey"`
-	XFingerprint      string       `json:"x_fingerprint"`
-	XVwirekey         string       `json:"x_vwirekey"`
-	_                 string       `json:"_id"`
+	VapTable          []struct {
+		ApMac      string `json:"ap_mac"`
+		Bssid      string `json:"bssid"`
+		Ccq        int    `json:"ccq"`
+		Channel    int    `json:"channel"`
+		Essid      string `json:"essid"`
+		ID         string `json:"id"`
+		IsGuest    bool   `json:"is_guest"`
+		IsWep      bool   `json:"is_wep"`
+		MapID      string `json:"map_id"`
+		Name       string `json:"name"`
+		NumSta     int    `json:"num_sta"`
+		Radio      string `json:"radio"`
+		RadioName  string `json:"radio_name"`
+		RxBytes    int    `json:"rx_bytes"`
+		RxCrypts   int    `json:"rx_crypts"`
+		RxDropped  int    `json:"rx_dropped"`
+		RxErrors   int    `json:"rx_errors"`
+		RxFrags    int    `json:"rx_frags"`
+		RxNwids    int    `json:"rx_nwids"`
+		RxPackets  int    `json:"rx_packets"`
+		SiteID     string `json:"site_id"`
+		State      string `json:"state"`
+		T          string `json:"t"`
+		TxBytes    int    `json:"tx_bytes"`
+		TxDropped  int    `json:"tx_dropped"`
+		TxErrors   int    `json:"tx_errors"`
+		TxPackets  int    `json:"tx_packets"`
+		TxPower    int    `json:"tx_power"`
+		TxRetries  int    `json:"tx_retries"`
+		Up         bool   `json:"up"`
+		Usage      string `json:"usage"`
+		WlanconfID string `json:"wlanconf_id"`
+	} `json:"vap_table,omitempty"`
+	Version                string           `json:"version"`
+	VersionIncompatible    bool             `json:"version_incompatible"`
+	VwireEnabled           bool             `json:"vwireEnabled,omitempty"`
+	VwireTable             []interface{}    `json:"vwire_table,omitempty"`
+	VwireVapTable          []interface{}    `json:"vwire_vap_table,omitempty"`
+	WifiCaps               int              `json:"wifi_caps,omitempty"`
+	X                      int              `json:"x,omitempty"`
+	XAuthkey               string           `json:"x_authkey"`
+	XFingerprint           string           `json:"x_fingerprint"`
+	XHasSSHHostkey         bool             `json:"x_has_ssh_hostkey"`
+	XInformAuthkey         string           `json:"x_inform_authkey"`
+	XSSHHostkeyFingerprint string           `json:"x_ssh_hostkey_fingerprint"`
+	XVwirekey              string           `json:"x_vwirekey,omitempty"`
+	Y                      int              `json:"y,omitempty"`
+	DhcpServerTable        []interface{}    `json:"dhcp_server_table,omitempty"`
+	Dot1XPortctrlEnabled   bool             `json:"dot1x_portctrl_enabled,omitempty"`
+	FlowctrlEnabled        bool             `json:"flowctrl_enabled,omitempty"`
+	GeneralTemperature     int              `json:"general_temperature,omitempty"`
+	HasFan                 bool             `json:"has_fan,omitempty"`
+	HasTemperature         bool             `json:"has_temperature,omitempty"`
+	JumboframeEnabled      bool             `json:"jumboframe_enabled,omitempty"`
+	Overheating            bool             `json:"overheating,omitempty"`
+	StpPriority            string           `json:"stp_priority,omitempty"`
+	StpVersion             string           `json:"stp_version,omitempty"`
+	UplinkDepth            int              `json:"uplink_depth,omitempty"`
+	ConfigNetworkWan       ConfigNetworkWan `json:"config_network_wan,omitempty"`
+	ConfigNetworkWan2      ConfigNetworkWan `json:"config_network_wan2,omitempty"`
+	NetworkTable           []interface{}    `json:"network_table,omitempty"`
+	NumDesktop             int              `json:"num_desktop,omitempty"`
+	NumHandheld            int              `json:"num_handheld,omitempty"`
+	NumMobile              int              `json:"num_mobile,omitempty"`
+	SpeedtestStatus        struct {
+		Latency        string  `json:"latency"`
+		Rundate        int     `json:"rundate"`
+		Runtime        int     `json:"runtime"`
+		StatusDownload int     `json:"status_download"`
+		StatusPing     int     `json:"status_ping"`
+		StatusSummary  int     `json:"status_summary"`
+		StatusUpload   int     `json:"status_upload"`
+		XputDownload   float64 `json:"xput_download"`
+		XputUpload     float64 `json:"xput_upload"`
+	} `json:"speedtest-status,omitempty"`
+	SpeedtestStatusSaved bool           `json:"speedtest-status-saved,omitempty"`
+	UsgCaps              int            `json:"usg_caps,omitempty"`
+	Wan1                 Wan            `json:"wan1,omitempty"`
+	Wan2                 Wan            `json:"waWann2,omitempty"`
+	PortOverrides        []PortOverride `json:"port_overrides"`
 }
 
-type UAPmap map[string]UAP
+type DeviceMap map[string]Device
+
+// Returns a slice of devices
+func (u *Unifi) Devices(site *Site, filter string) ([]Device, error) {
+
+	// Devices
+	var devices []Device
+
+	rawDevices, err := u.RawDevices(site, filter)
+
+	for i, _ := range rawDevices {
+		var device *Device
+		err := json.Unmarshal(rawDevices[i].Data, &device)
+		if err != nil {
+			return devices, err
+		}
+
+		// Set unifi pointer
+		device.u = u
+
+		devices = append(devices, *device)
+	}
+	return devices, err
+}
+
+// Returns a map of access points with mac as a key
+func (u *Unifi) DeviceMap(site *Site) (DeviceMap, error) {
+	devices, err := u.Devices(site, "")
+	if err != nil {
+		return nil, err
+	}
+	m := make(DeviceMap)
+	for _, d := range devices {
+		m[d.Mac] = d
+	}
+	return m, nil
+}
+
+func (d Device) DeviceName() string {
+	if d.Name != "" {
+		return d.Name
+	}
+	// If no name is given, return mac as name
+	return d.Mac
+}
+
+func (d Device) ModelName() string {
+	if m, ok := model[d.Model]; ok {
+		return m
+	}
+	return "unknown"
+}
 
 var model = map[string]string{
 	// APs
@@ -461,52 +666,6 @@ var model = map[string]string{
 	"USXG":     "Ubiquiti UniFi US-16-XG",
 }
 
-// Reboot access point
-func (a UAP) Restart() error {
-	if a.u == nil {
-		return ErrLoginFirst
-	}
-	return a.u.devcmd(a.Mac, "restart")
-}
-
-// Reboot switch
-func (s USW) Restart() error {
-	if s.u == nil {
-		return ErrLoginFirst
-	}
-	return s.u.devcmd(s.Mac, "restart")
-}
-
-func (a UAP) ModelName() string {
-	if m, ok := model[a.Model]; ok {
-		return m
-	}
-	return "unknown"
-}
-
-func (s USW) ModelName() string {
-	if m, ok := model[s.Model]; ok {
-		return m
-	}
-	return s.Model
-}
-
-func (a UAP) DeviceName() string {
-	if a.Name != "" {
-		return a.Name
-	}
-	// If no name is given, return mac as name
-	return a.Mac
-}
-
-func (s USW) DeviceName() string {
-	if s.Name != "" {
-		return s.Name
-	}
-	// If no name is given, return mac as name
-	return s.Mac
-}
-
 type DevState int
 
 //go:generate stringer -type=DevState
@@ -527,9 +686,3 @@ const (
 	IsolationPending DevState = 12
 	AdoptingWireless DevState = 13
 )
-
-func (a UAP) SetU(u *Unifi) {
-	if u != nil {
-		a.u = u
-	}
-}
