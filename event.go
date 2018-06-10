@@ -30,6 +30,20 @@ type EVT_AP_Lost_Contact struct {
 	Time      int64     `json:"time"`
 }
 
+// EVT_SW_PoeDisconnect controller version 5.8.21+ / USW firmware 3.9.27+
+type EVT_SW_PoeDisconnect struct {
+	ID        string    `json:"_id"`
+	Datetime  time.Time `json:"datetime"`
+	Key       string    `json:"key"`
+	Msg       string    `json:"msg"`
+	Port      int       `json:"port"`
+	SiteID    string    `json:"site_id"`
+	Subsystem string    `json:"subsystem"`
+	Sw        string    `json:"sw"`
+	SwName    string    `json:"sw_name"`
+	Time      int64     `json:"time"`
+}
+
 // Returns a slice of json RawDevices as received by the controller
 func (u *Unifi) Events(site *Site) ([]Event, error) {
 
