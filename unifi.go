@@ -49,7 +49,7 @@ func Login(user, pass, host, port, site string, version int) (*Unifi, error) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	
+
 	cj, _ := cookiejar.New(nil)
 	u.client = &http.Client{
 		Transport: tr,
@@ -100,7 +100,7 @@ func (u *Unifi) apicmd(site *Site, cmd string, payload interface{}) ([]byte, err
 	if payload == nil {
 		resp, err = u.client.Get(url)
 	} else {
-	
+
 		json, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
@@ -108,11 +108,11 @@ func (u *Unifi) apicmd(site *Site, cmd string, payload interface{}) ([]byte, err
 
 		resp, err = u.client.Post(url, "application/json", bytes.NewBuffer(json))
 	}
-	
+
 	if err != nil {
 		return nil, err
-	}	
-	
+	}
+
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -192,23 +192,6 @@ func (u *Unifi) maccmd(mgr string, args interface{}) error {
 	val := url.Values{"json": {string(param)}}
 	_, err = u.client.PostForm(u.apiURL+"cmd/"+mgr, val)
 	return err
-}
-
-func (u *Unifi) parsePost(site *Site, cmd string, jsonPayload []byte, v interface{}) error {
-	body, err := u.apicmd(site, cmd, jsonPayload)
-	if err != nil {
-		return err
-	}
-	if err := json.Unmarshal(body, &v); err != nil {
-		log.Println(cmd)
-		log.Println(string(body))
-		return err
-	}
-	m := reflect.ValueOf(v).Elem().FieldByName("Meta").Interface().(meta)
-	if m.Rc != "ok" {
-		return fmt.Errorf("%s returned result code: %s", cmd, m.Rc)
-	}
-	return nil
 }
 
 func (u *Unifi) parse(site *Site, cmd string, payload interface{}, v interface{}) error {
