@@ -47,7 +47,7 @@ func (u *Unifi) Voucher(site *Site) ([]Voucher, error) {
 		Data []Voucher
 		Meta meta
 	}
-	err := u.parse(site, "stat/voucher", &response)
+	err := u.parse(site, "stat/voucher", nil, &response)
 	for i := range response.Data {
 		response.Data[i].u = u
 	}

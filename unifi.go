@@ -49,6 +49,7 @@ func Login(user, pass, host, port, site string, version int) (*Unifi, error) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
+
 	cj, _ := cookiejar.New(nil)
 	u.client = &http.Client{
 		Transport: tr,
@@ -64,6 +65,7 @@ func Login(user, pass, host, port, site string, version int) (*Unifi, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	r := bytes.NewReader(j)
 	if _, err := u.client.Post(u.baseURL+"api/login", "application/json", r); err != nil {
 		fmt.Println(err)
@@ -80,7 +82,7 @@ func (u *Unifi) Logout() {
 	u.client.Get(u.baseURL + "logout")
 }
 
-func (u *Unifi) apicmd(site *Site, cmd string) ([]byte, error) {
+func (u *Unifi) apicmd(site *Site, cmd string, payload interface{}) ([]byte, error) {
 
 	url := u.apiURL
 
@@ -92,10 +94,25 @@ func (u *Unifi) apicmd(site *Site, cmd string) ([]byte, error) {
 	// Add the command to the url
 	url += cmd
 
-	resp, err := u.client.Get(url)
+	var resp *http.Response
+	var err error
+
+	if payload == nil {
+		resp, err = u.client.Get(url)
+	} else {
+
+		json, err := json.Marshal(payload)
+		if err != nil {
+			return nil, err
+		}
+
+		resp, err = u.client.Post(url, "application/json", bytes.NewBuffer(json))
+	}
+
 	if err != nil {
 		return nil, err
 	}
+
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -177,8 +194,8 @@ func (u *Unifi) maccmd(mgr string, args interface{}) error {
 	return err
 }
 
-func (u *Unifi) parse(site *Site, cmd string, v interface{}) error {
-	body, err := u.apicmd(site, cmd)
+func (u *Unifi) parse(site *Site, cmd string, payload interface{}, v interface{}) error {
+	body, err := u.apicmd(site, cmd, payload)
 	if err != nil {
 		return err
 	}
@@ -200,7 +217,7 @@ func (u *Unifi) Sta(site *Site) ([]Sta, error) {
 		Data []Sta
 		Meta meta
 	}
-	err := u.parse(site, "stat/sta", &response)
+	err := u.parse(site, "stat/sta", nil, &response)
 	for i := range response.Data {
 		response.Data[i].u = u
 	}
@@ -226,7 +243,7 @@ func (u *Unifi) Users(site *Site) ([]User, error) {
 		Data []User
 		Meta meta
 	}
-	err := u.parse(site, "list/user", &response)
+	err := u.parse(site, "list/user", nil, &response)
 	return response.Data, err
 }
 
@@ -236,7 +253,7 @@ func (u *Unifi) PortProfiles(site *Site) ([]PortProfile, error) {
 		Data []PortProfile
 		Meta meta
 	}
-	err := u.parse(site, "list/portconf", &response)
+	err := u.parse(site, "list/portconf", nil, &response)
 	return response.Data, err
 }
 
@@ -288,7 +305,7 @@ func (u *Unifi) UserGroups(site *Site) ([]UserGroup, error) {
 		Data []UserGroup
 		Meta meta
 	}
-	err := u.parse(site, "list/usergroup", &response)
+	err := u.parse(site, "list/usergroup", nil, &response)
 	return response.Data, err
 }
 
@@ -298,7 +315,7 @@ func (u *Unifi) WlanConf(site *Site) ([]WlanConf, error) {
 		Data []WlanConf
 		Meta meta
 	}
-	err := u.parse(site, "list/wlanconf", &response)
+	err := u.parse(site, "list/wlanconf", nil, &response)
 	return response.Data, err
 }
 

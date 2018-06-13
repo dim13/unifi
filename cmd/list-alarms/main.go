@@ -1,8 +1,8 @@
-// Copyright (c) 2018 The unifi Authors. All rights reserved.
+// Copyright (c) 2014 Dimitri Sokolyuk. All rights reserved.
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// Example command list-events
+// Example command list-alarm
 // List Events of a given site
 package main
 
@@ -19,19 +19,18 @@ import (
 )
 
 var (
-	host    = flag.String("host", "unifi", "Controller hostname")
-	user    = flag.String("user", "admin", "Controller username")
-	pass    = flag.String("pass", "unifi", "Controller password")
-	version = flag.Int("version", 5, "Controller base version")
-	port    = flag.String("port", "8443", "Controller port")
-	siteID  = flag.String("siteid", "default", "Sitename or description")
-	limit   = flag.Int("limit", 3000, "Max number of returned events")
-	start   = flag.Int("start", 0, "Index of first event (offset)")
-	within  = flag.Int("within", 4320, "Number of hours back")
-	unknown = flag.Bool("listUnknown", false, "Print unknown events in raw format (helps for adding them")
+	host      = flag.String("host", "unifi", "Controller hostname")
+	user      = flag.String("user", "admin", "Controller username")
+	pass      = flag.String("pass", "unifi", "Controller password")
+	version   = flag.Int("version", 5, "Controller base version")
+	port      = flag.String("port", "8443", "Controller port")
+	siteID    = flag.String("siteid", "default", "Sitename or description")
+	limit     = flag.Int("limit", 500, "Max number of returned alarms")
+	start     = flag.Int("start", 0, "Index of first event (offset)")
+	withcount = flag.Bool("withcount", true, "???")
+	archived  = flag.Bool("archived", false, "Archived Alerts")
+	unknown   = flag.Bool("listUnknown", false, "Print unknown events in raw format (helps for adding them")
 )
-
-//{"_limit":500,"_start":0,"_withcount":true,"archived":false} // Alarms
 
 func main() {
 	w := new(tabwriter.Writer)
@@ -52,27 +51,28 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var eventFilter unifi.EventFilter
-	eventFilter.Limit = *limit
-	eventFilter.Start = *start
-	eventFilter.Within = *within
+	var alarmFilter unifi.AlarmFilter
+	alarmFilter.Limit = *limit
+	alarmFilter.Start = *start
+	alarmFilter.Withcount = *withcount
+	alarmFilter.Archived = *archived
 
 	// Print basic events
 
 	if *unknown == false {
 
-		be, err := u.BasicEvents(site, eventFilter)
+		be, err := u.BasicAlarms(site, alarmFilter)
 		if err != nil {
 			log.Fatalln(err)
 			return
 		}
 
-		fmt.Fprintln(w, "Timestamp\tId\tKey\tMessage")
+		fmt.Fprintf(w, "\n\nTimestamp\tId\tKey\tMessage\tArchived\n")
 
 		for _, e := range be {
 
 			timestamp := time.Unix(0, e.Time*int64(time.Millisecond))
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", timestamp.String(), e.ID, e.Key, e.Message)
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%t\n", timestamp.String(), e.ID, e.Key, e.Message, e.Archived)
 
 		}
 	} else {
@@ -81,7 +81,7 @@ func main() {
 
 		fmt.Fprintf(w, "\n\nUnknown Events\n")
 
-		re, err := u.RawEvents(site, eventFilter)
+		re, err := u.RawAlarms(site, alarmFilter)
 		if err != nil {
 			log.Fatalln(err)
 			return
