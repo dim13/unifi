@@ -34,7 +34,7 @@ func (u *Unifi) Networks(site *Site) ([]Network, error) {
 		Data []Network
 		Meta meta
 	}
-	err := u.parse(site, "rest/networkconf", &response)
+	err := u.parse(site, "rest/networkconf", nil, &response)
 	return response.Data, err
 }
 

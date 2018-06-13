@@ -376,7 +376,7 @@ func (u *Unifi) RawDevices(site *Site, filter string) ([]RawDevice, error) {
 		Data []json.RawMessage
 		Meta meta
 	}
-	err := u.parse(site, "stat/device", &response)
+	err := u.parse(site, "stat/device", nil, &response)
 
 	for _, d := range response.Data {
 

@@ -47,7 +47,7 @@ func (u *Unifi) Sites() ([]Site, error) {
 		Data []Site
 		Meta meta
 	}
-	err := u.parse(nil, "self/sites", &response)
+	err := u.parse(nil, "self/sites", nil, &response)
 	return response.Data, err
 }
 

@@ -109,7 +109,7 @@ func (u *Unifi) Health(site *Site) (Health, error) {
 	}
 
 	// Fetch the health data
-	err := u.parse(site, "stat/health", &response)
+	err := u.parse(site, "stat/health", nil, &response)
 
 	// Loop thru the data objects to parse them with the corresponding struct
 	for _, d := range response.Data {
