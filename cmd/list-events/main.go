@@ -1,4 +1,4 @@
-// Copyright (c) 2018 The unifi Authors. All rights reserved.
+// Copyright (c) 2014 Dimitri Sokolyuk. All rights reserved.
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
@@ -55,6 +55,7 @@ func main() {
 	var eventFilter unifi.EventFilter
 	eventFilter.Limit = *limit
 	eventFilter.Start = *start
+
 	eventFilter.Within = *within
 
 	// Print basic events
@@ -93,28 +94,32 @@ func main() {
 		for _, e := range re {
 			switch e.Key {
 			case "EVT_AD_Login":
+			case "EVT_AP_Adopted":
+			case "EVT_AP_Connected":
 			case "EVT_AP_DetectRogueAP":
+			case "EVT_AP_DiscoveredPending":
+			case "EVT_AP_Isolated":
+			case "EVT_AP_Lost_Contact":
+			case "EVT_AP_PossibleInterference":
+			case "EVT_AP_Restarted":
+			case "EVT_AP_RestartedUnknown":
+			case "EVT_AP_Upgraded":
+			case "EVT_AP_UpgradeScheduled":
 			case "EVT_LU_Connected":
 			case "EVT_LU_Disconnected":
+			case "EVT_SW_Adopted":
+			case "EVT_SW_Connected":
+			case "EVT_SW_DiscoveredPending":
+			case "EVT_SW_Lost_Contact":
+			case "EVT_SW_PoeDisconnect":
+			case "EVT_SW_RestartedUnknown":
+			case "EVT_SW_Upgraded":
+			case "EVT_SW_UpgradeScheduled":
 			case "EVT_WU_Connected":
 			case "EVT_WU_Disconnected":
 			case "EVT_WU_Roam":
 			case "EVT_WU_RoamRadio":
-			case "EVT_AP_Connected":
-			case "EVT_SW_Connected":
-			case "EVT_AP_Isolated":
-			case "EVT_AP_DiscoveredPending":
-			case "EVT_AP_Adopted":
-			case "EVT_AP_UpgradeScheduled":
-			case "EVT_AP_Upgraded":
-			case "EVT_AP_RestartedUnknown":
-			case "EVT_SW_DiscoveredPending":
-			case "EVT_SW_Adopted":
-			case "EVT_SW_UpgradeScheduled":
-			case "EVT_SW_Upgraded":
-			case "EVT_AP_Restarted":
-			case "EVT_AP_PossibleInterference":
-			case "EVT_SW_PoeDisconnect":
+
 			default:
 				j, err := json.Marshal(&e.Data)
 				if err != nil {

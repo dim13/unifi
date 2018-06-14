@@ -2,7 +2,7 @@
 // Use of this source code is governed by ISC-style license
 // that can be found in the LICENSE file.
 
-// Example command list-alarm
+// Example command list-events
 // List Events of a given site
 package main
 
@@ -12,24 +12,24 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"text/tabwriter"
 	"time"
+	"text/tabwriter"
 
 	"github.com/dim13/unifi"
 )
 
 var (
-	host      = flag.String("host", "unifi", "Controller hostname")
-	user      = flag.String("user", "admin", "Controller username")
-	pass      = flag.String("pass", "unifi", "Controller password")
-	version   = flag.Int("version", 5, "Controller base version")
-	port      = flag.String("port", "8443", "Controller port")
-	siteID    = flag.String("siteid", "default", "Sitename or description")
-	limit     = flag.Int("limit", 500, "Max number of returned alarms")
-	start     = flag.Int("start", 0, "Index of first event (offset)")
-	withcount = flag.Bool("withcount", true, "???")
-	archived  = flag.Bool("archived", false, "Archived Alerts")
-	unknown   = flag.Bool("listUnknown", false, "Print unknown events in raw format (helps for adding them")
+	host    = flag.String("host", "unifi", "Controller hostname")
+	user    = flag.String("user", "admin", "Controller username")
+	pass    = flag.String("pass", "unifi", "Controller password")
+	version = flag.Int("version", 5, "Controller base version")
+	port    = flag.String("port", "8443", "Controller port")
+	siteID  = flag.String("siteid", "default", "Sitename or description")
+	limit   = flag.Int("limit", 500, "Max number of returned alarms")
+	start   = flag.Int("start", 0, "Index of first event (offset)")
+	withcount  = flag.Bool("withcount", true, "???")
+	archived = flag.Bool("archived", false, "Archived Alerts")
+	unknown = flag.Bool("listUnknown", false, "Print unknown events in raw format (helps for adding them")
 )
 
 func main() {
@@ -58,29 +58,35 @@ func main() {
 	alarmFilter.Archived = *archived
 
 	// Print basic events
+	
 
 	if *unknown == false {
-
+	
 		be, err := u.BasicAlarms(site, alarmFilter)
 		if err != nil {
 			log.Fatalln(err)
 			return
 		}
 
-		fmt.Fprintf(w, "\n\nTimestamp\tId\tKey\tMessage\tArchived\n")
+		fmt.Fprintf(w, "\n\nTimestamp\tId\tKey\tMessage\tArchived\tHandledAdminID\tHandleTime\n")
 
-		for _, e := range be {
-
+		for _,e := range be {
+		
 			timestamp := time.Unix(0, e.Time*int64(time.Millisecond))
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%t\n", timestamp.String(), e.ID, e.Key, e.Message, e.Archived)
 
+			if e.Archived == nil || *(e.Archived) == false {
+				fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%t\tNot available\tNot Available\n", timestamp.String(), e.ID, e.Key, e.Message, *(e.Archived))
+			} else {
+				fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%t\t%s\t%s\n", timestamp.String(), e.ID, e.Key, e.Message, *(e.Archived), e.HandledAdminID, e.HandledTime.Format("2006-01-02 15:04:05"))
+			}
 		}
 	} else {
 
-		// Print unknown events in json format
-
+	
+	// Print unknown events in json format
+	
 		fmt.Fprintf(w, "\n\nUnknown Events\n")
-
+	
 		re, err := u.RawAlarms(site, alarmFilter)
 		if err != nil {
 			log.Fatalln(err)
@@ -89,7 +95,7 @@ func main() {
 
 		totalEvents := 0
 		unknownEvents := 0
-
+	
 		for _, e := range re {
 			switch e.Key {
 			case "EVT_AD_Login":
@@ -115,6 +121,10 @@ func main() {
 			case "EVT_AP_Restarted":
 			case "EVT_AP_PossibleInterference":
 			case "EVT_SW_PoeDisconnect":
+			case "EVT_AP_Lost_Contact":
+			case "EVT_SW_RestartedUnknown":
+			case "EVT_SW_Lost_Contact":
+
 			default:
 				j, err := json.Marshal(&e.Data)
 				if err != nil {
@@ -125,7 +135,7 @@ func main() {
 			}
 			totalEvents++
 		}
-
+	
 		fmt.Fprintf(w, "Total Events:   %d\n", totalEvents)
 		fmt.Fprintf(w, "Unknown Events: %d\n", unknownEvents)
 
