@@ -99,18 +99,19 @@ func (u *Unifi) apicmd(site *Site, cmd string, payload interface{}) ([]byte, err
 
 	if payload == nil {
 		resp, err = u.client.Get(url)
+		if err != nil {
+			return nil, err
+		}
 	} else {
-
 		json, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
 		}
 
 		resp, err = u.client.Post(url, "application/json", bytes.NewBuffer(json))
-	}
-
-	if err != nil {
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	defer resp.Body.Close()

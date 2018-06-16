@@ -9,12 +9,11 @@ import (
 	"fmt"
 )
 
-
 type AlarmFilter struct {
-	Limit  int `json:"_limit"`  
-	Start  int `json:"_start"`
+	Limit     int  `json:"_limit"`
+	Start     int  `json:"_start"`
 	Withcount bool `json:"withcount"`
-	Archived bool `json:"archived"`
+	Archived  bool `json:"archived"`
 }
 
 type RawAlarm struct {
@@ -32,13 +31,12 @@ func (u *Unifi) RawAlarms(site *Site, filter interface{}) ([]RawAlarm, error) {
 		Data []json.RawMessage
 		Meta meta
 	}
-		
+
 	err := u.parse(site, "stat/alarm", filter, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	
 	for _, d := range response.Data {
 
 		// unmarshal into a map to check the "type" field
@@ -66,9 +64,9 @@ func (u *Unifi) BasicAlarms(site *Site, filter interface{}) ([]BasicEvent, error
 
 	var basicAlarms []BasicEvent
 
-	rawAlarms, err := u.RawAlarms(site, filter) 
+	rawAlarms, err := u.RawAlarms(site, filter)
 
-	for _, ra := range rawAlarms{
+	for _, ra := range rawAlarms {
 
 		var ba BasicEvent
 		err := json.Unmarshal(ra.Data, &ba)

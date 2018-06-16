@@ -28,7 +28,7 @@ var (
 	limit   = flag.Int("limit", 3000, "Max number of returned events")
 	start   = flag.Int("start", 0, "Index of first event (offset)")
 	within  = flag.Int("within", 4320, "Number of hours back")
-	unknown = flag.Bool("listUnknown", false, "Print unknown events in raw format (helps for adding them")
+	unknown = flag.Bool("listUnknown", false, "Print unknown events in raw format (helps for adding them)")
 )
 
 //{"_limit":500,"_start":0,"_withcount":true,"archived":false} // Alarms
@@ -60,7 +60,7 @@ func main() {
 
 	// Print basic events
 
-	if *unknown == false {
+	if !*unknown {
 
 		be, err := u.BasicEvents(site, eventFilter)
 		if err != nil {
