@@ -8,7 +8,7 @@ type StaMap map[string]Sta
 
 // Station data
 type Sta struct {
-	u                *Unifi `jsonn:-`
+	u                *Unifi
 	ID               string `json:"_id"`
 	IsGuestByUsw     bool   `json:"_is_guest_by_usw,omitempty"`
 	LastSeenByUsw    int    `json:"_last_seen_by_usw,omitempty"`
@@ -33,7 +33,7 @@ type Sta struct {
 	Hostname         string `json:"hostname,omitempty"`
 	IsGuestByUap     bool   `json:"_is_guest_by_uap,omitempty"`
 	LastSeenByUap    int    `json:"_last_seen_by_uap,omitempty"`
-	RoamCount        int    `json:"roam_count",,omitempty`
+	RoamCount        int    `json:"roam_count,omitempty"`
 	UptimeByUap      int    `json:"_uptime_by_uap,omitempty"`
 	ApMac            string `json:"ap_mac,omitempty"`
 	Authorized       bool   `json:"authorized,omitempty"`

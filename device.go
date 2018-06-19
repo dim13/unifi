@@ -71,7 +71,7 @@ type Port struct {
 	StpState       string `json:"stp_state"`
 	TxBroadcast    int64  `json:"tx_broadcast"`
 	TxMulticast    int64  `json:"tx_multicast"`
-	TxBytes        int64  `json"tx_bytes"`
+	TxBytes        int64  `json:"tx_bytes"`
 	TxBytesR       int64  `json:"tx_bytes-r"`
 	TxDropped      int64  `json:"tx_dropped"`
 	TxErrors       int64  `json:"tx_errors"`
@@ -461,7 +461,7 @@ type Device struct {
 		Radio              string `json:"radio"`
 		RadioCaps          int    `json:"radio_caps"`
 		WlangroupID        string `json:"wlangroup_id"`
-	} `json:"radio_table",omitempty`
+	} `json:"radio_table,omitempty"`
 	RadioTableStats []struct {
 		AstBeXmit   interface{} `json:"ast_be_xmit"`
 		AstCst      interface{} `json:"ast_cst"`
@@ -481,7 +481,7 @@ type Device struct {
 		TxPower     int         `json:"tx_power"`
 		TxRetries   int         `json:"tx_retries"`
 		UserNumSta  int         `json:"user-num_sta"`
-	} `json:"radio_table_stats",omitempty`
+	} `json:"radio_table_stats,omitempty"`
 	RxBytes           int           `json:"rx_bytes"`
 	RxBytesD          int           `json:"rx_bytes-d,omitempty"`
 	ScanRadioTable    []interface{} `json:"scan_radio_table,omitempty"`

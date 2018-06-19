@@ -55,7 +55,7 @@ type USW struct {
 	NextHeartbeatAt    int            `json:"next_heartbeat_at"`
 	NumSta             int            `json:"num_sta"`
 	Overheating        bool           `json:"overheating"`
-	PortOverrides      []PortOverride `json:"port_overrides",omitempty`
+	PortOverrides      []PortOverride `json:"port_overrides,omitempty"`
 	PortTable          []Port         `json:"port_table"`
 	RxBytes            int64          `json:"rx_bytes"`
 	Serial             string         `json:"serial"`

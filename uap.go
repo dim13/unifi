@@ -57,7 +57,7 @@ type UAP struct {
 	NextHeartbeatAt int           `json:"next_heartbeat_at"`
 	NumSta          int           `json:"num_sta"`
 	PortStats       []interface{} `json:"port_stats"`
-	PortTable       []Port        `json:"port_table",omitempty`
+	PortTable       []Port        `json:"port_table,omitempty"`
 	RadioTable      []struct {
 		BuiltinAntGain     int    `json:"builtin_ant_gain"`
 		BuiltinAntenna     bool   `json:"builtin_antenna"`
