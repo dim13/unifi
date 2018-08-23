@@ -637,7 +637,7 @@ func (d Device) ModelName() string {
 	if m, ok := model[d.Model]; ok {
 		return m
 	}
-	return "unknown"
+	return "unknown " + d.Model
 }
 
 var model = map[string]string{
@@ -664,6 +664,7 @@ var model = map[string]string{
 	"US16P150": "UniFi US-16-150W",
 	"US24P250": "UniFi US-24-250W",
 	"USXG":     "Ubiquiti UniFi US-16-XG",
+	"US24":     "UniFi Switch 24",
 }
 
 type DevState int

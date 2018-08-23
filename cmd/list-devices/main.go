@@ -72,11 +72,11 @@ func main() {
 		fmt.Fprintln(w, strings.Join(p, "\t"))
 
 		switch d.Type {
-		case "uap":
+		case unifi.TypeAccessPoint:
 			numberOfUAPs++
-		case "usw":
+		case unifi.TypeSwitch:
 			numberOfUSWs++
-		case "ugw":
+		case unifi.TypeGateway:
 			numberOfUGWs++
 		}
 
