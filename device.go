@@ -570,7 +570,7 @@ type Device struct {
 	NumHandheld            int              `json:"num_handheld,omitempty"`
 	NumMobile              int              `json:"num_mobile,omitempty"`
 	SpeedtestStatus        struct {
-		Latency        string  `json:"latency"`
+		Latency        float64 `json:"latency"` // NOTE: Prior to 5.8 type string
 		Rundate        int     `json:"rundate"`
 		Runtime        int     `json:"runtime"`
 		StatusDownload int     `json:"status_download"`
