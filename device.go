@@ -679,6 +679,7 @@ var model = map[string]string{
 	"US48":     "UniFi Switch 48",
 	"US48P500": "UniFi Switch 48 POE-500W",
 	"US48P750": "UniFi Switch 48 POE-750W",
+	"US8P60":   "UniFi Switch 8 POE-60W",
 	"US8P150":  "UniFi Switch 8 POE-150W",
 	"USXG":     "Ubiquiti UniFi US-16-XG",
 	"p2N":      "PicoStation M2",
