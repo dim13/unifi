@@ -274,14 +274,14 @@ type UAP struct {
 	VwireTable             []interface{} `json:"vwire_table"`
 	VwireVapTable          []interface{} `json:"vwire_vap_table"`
 	WifiCaps               int           `json:"wifi_caps"`
-	X                      int           `json:"x"`
+	X                      fuzzyFloat    `json:"x"`
 	XAuthkey               string        `json:"x_authkey"`
 	XFingerprint           string        `json:"x_fingerprint"`
 	XHasSSHHostkey         bool          `json:"x_has_ssh_hostkey"`
 	XInformAuthkey         string        `json:"x_inform_authkey"`
 	XSSHHostkeyFingerprint string        `json:"x_ssh_hostkey_fingerprint"`
 	XVwirekey              string        `json:"x_vwirekey"`
-	Y                      int           `json:"y"`
+	Y                      fuzzyFloat    `json:"y"`
 }
 
 type UAPmap map[string]UAP

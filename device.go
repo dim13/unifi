@@ -544,14 +544,14 @@ type Device struct {
 	VwireTable             []interface{}    `json:"vwire_table,omitempty"`
 	VwireVapTable          []interface{}    `json:"vwire_vap_table,omitempty"`
 	WifiCaps               int              `json:"wifi_caps,omitempty"`
-	X                      int              `json:"x,omitempty"`
+	X                      fuzzyFloat       `json:"x,omitempty"`
 	XAuthkey               string           `json:"x_authkey"`
 	XFingerprint           string           `json:"x_fingerprint"`
 	XHasSSHHostkey         bool             `json:"x_has_ssh_hostkey"`
 	XInformAuthkey         string           `json:"x_inform_authkey"`
 	XSSHHostkeyFingerprint string           `json:"x_ssh_hostkey_fingerprint"`
 	XVwirekey              string           `json:"x_vwirekey,omitempty"`
-	Y                      int              `json:"y,omitempty"`
+	Y                      fuzzyFloat       `json:"y,omitempty"`
 	DhcpServerTable        []interface{}    `json:"dhcp_server_table,omitempty"`
 	Dot1XPortctrlEnabled   bool             `json:"dot1x_portctrl_enabled,omitempty"`
 	FlowctrlEnabled        bool             `json:"flowctrl_enabled,omitempty"`
