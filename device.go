@@ -184,8 +184,12 @@ type PortOverride struct {
 	StormcontrolUcastRate    *int   `json:"stormctrl_ucast_rate,omitempty"`
 }
 
-// API version 5.7.20
+// API version 5.12.35
 type Stat struct {
+	Ap Ap `json:"ap"`
+}
+
+type Ap struct {
 	Ap                                             string    `json:"ap"`
 	Bytes                                          float64   `json:"bytes"`
 	Datetime                                       time.Time `json:"datetime"`
