@@ -89,17 +89,17 @@ type Uplink struct {
 	Netmask     string `json:"netmask"`
 	NumPort     int    `json:"num_port"`
 	RxBytes     int64  `json:"rx_bytes"`
-	RxBytesR    int    `json:"rx_bytes-r"`
-	RxDropped   int    `json:"rx_dropped"`
-	RxErrors    int    `json:"rx_errors"`
-	RxMulticast int    `json:"rx_multicast"`
-	RxPackets   int    `json:"rx_packets"`
+	RxBytesR    int64  `json:"rx_bytes-r"`
+	RxDropped   int64  `json:"rx_dropped"`
+	RxErrors    int64  `json:"rx_errors"`
+	RxMulticast int64  `json:"rx_multicast"`
+	RxPackets   int64  `json:"rx_packets"`
 	Speed       int    `json:"speed"`
 	TxBytes     int64  `json:"tx_bytes"`
-	TxBytesR    int    `json:"tx_bytes-r"`
-	TxDropped   int    `json:"tx_dropped"`
-	TxErrors    int    `json:"tx_errors"`
-	TxPackets   int    `json:"tx_packets"`
+	TxBytesR    int64  `json:"tx_bytes-r"`
+	TxDropped   int64  `json:"tx_dropped"`
+	TxErrors    int64  `json:"tx_errors"`
+	TxPackets   int64  `json:"tx_packets"`
 	Type        string `json:"type"`
 	Up          bool   `json:"up"`
 }

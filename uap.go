@@ -16,9 +16,9 @@ type UAP struct {
 	//Uptime        int           `json:"_uptime"`
 	Adopted       bool          `json:"adopted"`
 	AntennaTable  []interface{} `json:"antenna_table"`
-	Bytes         int           `json:"bytes"`
-	BytesD        int           `json:"bytes-d"`
-	BytesR        int           `json:"bytes-r"`
+	Bytes         int64         `json:"bytes"`
+	BytesD        int64         `json:"bytes-d"`
+	BytesR        int64         `json:"bytes-r"`
 	Cfgversion    string        `json:"cfgversion"`
 	ConfigNetwork struct {
 		IP   string `json:"ip"`
@@ -88,14 +88,14 @@ type UAP struct {
 		NumSta      int         `json:"num_sta"`
 		Radio       string      `json:"radio"`
 		State       string      `json:"state"`
-		TxPackets   int         `json:"tx_packets"`
-		TxPower     int         `json:"tx_power"`
-		TxRetries   int         `json:"tx_retries"`
+		TxPackets   int64       `json:"tx_packets"`
+		TxPower     int64       `json:"tx_power"`
+		TxRetries   int64       `json:"tx_retries"`
 		UserNumSta  int         `json:"user-num_sta"`
 	} `json:"radio_table_stats"`
 
-	RxBytes          int           `json:"rx_bytes"`
-	RxBytesD         int           `json:"rx_bytes-d"`
+	RxBytes          int64         `json:"rx_bytes"`
+	RxBytesD         int64         `json:"rx_bytes-d"`
 	ScanRadioTable   []interface{} `json:"scan_radio_table"`
 	Scanning         bool          `json:"scanning"`
 	Serial           string        `json:"serial"`
@@ -204,8 +204,8 @@ type UAP struct {
 	} `json:"sys_stats"`
 	SystemStats struct {
 	} `json:"system-stats"`
-	TxBytes           int    `json:"tx_bytes"`
-	TxBytesD          int    `json:"tx_bytes-d"`
+	TxBytes           int64  `json:"tx_bytes"`
+	TxBytesD          int64  `json:"tx_bytes-d"`
 	Type              string `json:"type"`
 	Upgradable        bool   `json:"upgradable"`
 	UpgradeState      int    `json:"upgrade_state"`
@@ -219,17 +219,17 @@ type UAP struct {
 		Netmask     string `json:"netmask"`
 		NumPort     int    `json:"num_port"`
 		RxBytes     int64  `json:"rx_bytes"`
-		RxBytesR    int    `json:"rx_bytes-r"`
-		RxDropped   int    `json:"rx_dropped"`
-		RxErrors    int    `json:"rx_errors"`
-		RxMulticast int    `json:"rx_multicast"`
-		RxPackets   int    `json:"rx_packets"`
+		RxBytesR    int64  `json:"rx_bytes-r"`
+		RxDropped   int64  `json:"rx_dropped"`
+		RxErrors    int64  `json:"rx_errors"`
+		RxMulticast int64  `json:"rx_multicast"`
+		RxPackets   int64  `json:"rx_packets"`
 		Speed       int    `json:"speed"`
 		TxBytes     int64  `json:"tx_bytes"`
-		TxBytesR    int    `json:"tx_bytes-r"`
-		TxDropped   int    `json:"tx_dropped"`
-		TxErrors    int    `json:"tx_errors"`
-		TxPackets   int    `json:"tx_packets"`
+		TxBytesR    int64  `json:"tx_bytes-r"`
+		TxDropped   int64  `json:"tx_dropped"`
+		TxErrors    int64  `json:"tx_errors"`
+		TxPackets   int64  `json:"tx_packets"`
 		Type        string `json:"type"`
 		Up          bool   `json:"up"`
 	} `json:"uplink"`
@@ -250,22 +250,22 @@ type UAP struct {
 		NumSta     int    `json:"num_sta"`
 		Radio      string `json:"radio"`
 		RadioName  string `json:"radio_name"`
-		RxBytes    int    `json:"rx_bytes"`
-		RxCrypts   int    `json:"rx_crypts"`
-		RxDropped  int    `json:"rx_dropped"`
-		RxErrors   int    `json:"rx_errors"`
-		RxFrags    int    `json:"rx_frags"`
-		RxNwids    int    `json:"rx_nwids"`
-		RxPackets  int    `json:"rx_packets"`
+		RxBytes    int64  `json:"rx_bytes"`
+		RxCrypts   int64  `json:"rx_crypts"`
+		RxDropped  int64  `json:"rx_dropped"`
+		RxErrors   int64  `json:"rx_errors"`
+		RxFrags    int64  `json:"rx_frags"`
+		RxNwids    int64  `json:"rx_nwids"`
+		RxPackets  int64  `json:"rx_packets"`
 		SiteID     string `json:"site_id"`
 		State      string `json:"state"`
 		T          string `json:"t"`
-		TxBytes    int    `json:"tx_bytes"`
-		TxDropped  int    `json:"tx_dropped"`
-		TxErrors   int    `json:"tx_errors"`
-		TxPackets  int    `json:"tx_packets"`
-		TxPower    int    `json:"tx_power"`
-		TxRetries  int    `json:"tx_retries"`
+		TxBytes    int64  `json:"tx_bytes"`
+		TxDropped  int64  `json:"tx_dropped"`
+		TxErrors   int64  `json:"tx_errors"`
+		TxPackets  int64  `json:"tx_packets"`
+		TxPower    int64  `json:"tx_power"`
+		TxRetries  int64  `json:"tx_retries"`
 		Up         bool   `json:"up"`
 		Usage      string `json:"usage"`
 		WlanconfID string `json:"wlanconf_id"`

@@ -50,16 +50,16 @@ type Sta struct {
 	Radio            string `json:"radio,omitempty"`
 	RadioProto       string `json:"radio_proto,omitempty"`
 	Rssi             int    `json:"rssi,omitempty"`
-	RxBytes          int    `json:"rx_bytes,omitempty"`
-	RxBytesR         int    `json:"rx_bytes-r,omitempty"`
-	RxPackets        int    `json:"rx_packets,omitempty"`
-	RxRate           int    `json:"rx_rate,omitempty"`
+	RxBytes          int64  `json:"rx_bytes,omitempty"`
+	RxBytesR         int64  `json:"rx_bytes-r,omitempty"`
+	RxPackets        int64  `json:"rx_packets,omitempty"`
+	RxRate           int64  `json:"rx_rate,omitempty"`
 	Signal           int    `json:"signal,omitempty"`
-	TxBytes          int    `json:"tx_bytes,omitempty"`
-	TxBytesR         int    `json:"tx_bytes-r,omitempty"`
-	TxPackets        int    `json:"tx_packets,omitempty"`
-	TxPower          int    `json:"tx_power,omitempty"`
-	TxRate           int    `json:"tx_rate,omitempty"`
+	TxBytes          int64  `json:"tx_bytes,omitempty"`
+	TxBytesR         int64  `json:"tx_bytes-r,omitempty"`
+	TxPackets        int64  `json:"tx_packets,omitempty"`
+	TxPower          int64  `json:"tx_power,omitempty"`
+	TxRate           int64  `json:"tx_rate,omitempty"`
 	Vlan             int    `json:"vlan,omitempty"`
 }
 

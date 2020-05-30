@@ -17,10 +17,10 @@ type LAN struct {
 	NumPending      int    `json:"num_pending"`
 	NumSw           int    `json:"num_sw"`
 	NumUser         int    `json:"num_user"`
-	RxBytesR        int    `json:"rx_bytes-r"`
+	RxBytesR        int64  `json:"rx_bytes-r"`
 	Status          string `json:"status"`
 	Subsystem       string `json:"subsystem"`
-	TxBytesR        int    `json:"tx_bytes-r"`
+	TxBytesR        int64  `json:"tx_bytes-r"`
 }
 
 type VPN struct {
@@ -51,10 +51,10 @@ type WAN struct {
 	NumGw           int      `json:"num_gw"`
 	NumPending      int      `json:"num_pending"`
 	NumSta          int      `json:"num_sta"`
-	RxBytesR        int      `json:"rx_bytes-r"`
+	RxBytesR        int64    `json:"rx_bytes-r"`
 	Status          string   `json:"status"`
 	Subsystem       string   `json:"subsystem"`
-	TxBytesR        int      `json:"tx_bytes-r"`
+	TxBytesR        int64    `json:"tx_bytes-r"`
 	WanIP           string   `json:"wan_ip"`
 }
 
@@ -66,17 +66,17 @@ type WLAN struct {
 	NumGuest        int    `json:"num_guest"`
 	NumPending      int    `json:"num_pending"`
 	NumUser         int    `json:"num_user"`
-	RxBytesR        int    `json:"rx_bytes-r"`
+	RxBytesR        int64  `json:"rx_bytes-r"`
 	Status          string `json:"status"`
 	Subsystem       string `json:"subsystem"`
-	TxBytesR        int    `json:"tx_bytes-r"`
+	TxBytesR        int64  `json:"tx_bytes-r"`
 }
 
 type WWW struct {
 	Drops            int     `json:"drops"`
 	GwMac            string  `json:"gw_mac"`
 	Latency          int     `json:"latency"`
-	RxBytesR         int     `json:"rx_bytes-r"`
+	RxBytesR         int64   `json:"rx_bytes-r"`
 	SpeedtestLastrun int     `json:"speedtest_lastrun"`
 	SpeedtestPing    int     `json:"speedtest_ping"`
 	SpeedtestStatus  string  `json:"speedtest_status"`
