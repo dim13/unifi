@@ -4,6 +4,18 @@ package unifi
 
 import "strconv"
 
+func _() {
+	// An "invalid array index" compiler error signifies that the constant values have changed.
+	// Re-run the stringer command to generate them again.
+	var x [1]struct{}
+	_ = x[StpDisabled-0]
+	_ = x[StpBlocking-1]
+	_ = x[StpListening-2]
+	_ = x[StpLearning-3]
+	_ = x[StpForwarding-4]
+	_ = x[StpUnknown-9]
+}
+
 const (
 	_STP_name_0 = "StpDisabledStpBlockingStpListeningStpLearningStpForwarding"
 	_STP_name_1 = "StpUnknown"
