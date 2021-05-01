@@ -65,8 +65,8 @@ func main() {
 		strconv.Itoa(health.LAN.NumPending),
 		strconv.Itoa(health.LAN.NumUser),
 		strconv.Itoa(health.LAN.NumGuest),
-		strconv.Itoa(health.LAN.RxBytesR),
-		strconv.Itoa(health.LAN.TxBytesR),
+		strconv.FormatInt(health.LAN.RxBytesR, 10),
+		strconv.FormatInt(health.LAN.TxBytesR, 10),
 		health.LAN.LanIP,
 	}
 	fmt.Fprintln(w, strings.Join(p, "\t"))
@@ -83,8 +83,8 @@ func main() {
 		strconv.Itoa(health.WLAN.NumDisconnected),
 		strconv.Itoa(health.WLAN.NumUser),
 		strconv.Itoa(health.WLAN.NumGuest),
-		strconv.Itoa(health.WLAN.RxBytesR),
-		strconv.Itoa(health.WLAN.TxBytesR),
+		strconv.FormatInt(health.WLAN.RxBytesR, 10),
+		strconv.FormatInt(health.WLAN.TxBytesR, 10),
 		strconv.Itoa(health.WLAN.NumPending),
 	}
 	fmt.Fprintln(w, strings.Join(p, "\t"))
@@ -101,8 +101,8 @@ func main() {
 		strconv.Itoa(health.WAN.NumDisconnected),
 		strconv.Itoa(health.WAN.NumPending),
 		strconv.Itoa(health.WAN.NumSta),
-		strconv.Itoa(health.WAN.RxBytesR),
-		strconv.Itoa(health.WAN.TxBytesR),
+		strconv.FormatInt(health.WAN.RxBytesR, 10),
+		strconv.FormatInt(health.WAN.TxBytesR, 10),
 		health.WAN.WanIP,
 		strings.Join(health.WAN.Nameservers, " "),
 	}
@@ -115,8 +115,8 @@ func main() {
 	p = []string{
 		health.WWW.Subsystem,
 		health.WWW.Status,
-		strconv.Itoa(health.WWW.RxBytesR),
-		strconv.Itoa(health.WWW.TxBytesR),
+		strconv.FormatInt(health.WWW.RxBytesR, 10),
+		strconv.FormatInt(health.WWW.TxBytesR, 10),
 		strconv.Itoa(health.WWW.Drops),
 		health.WWW.GwMac,
 		strconv.Itoa(health.WWW.Latency),

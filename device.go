@@ -122,17 +122,17 @@ type StaTable struct {
 	Mac           string
 	Noise         int
 	Rssi          int
-	RxBytes       int `json:"rx_bytes"`
-	RxPackets     int `json:"rx_packets"`
-	RxRate        int `json:"rx_rate"`
+	RxBytes       int64 `json:"rx_bytes"`
+	RxPackets     int64 `json:"rx_packets"`
+	RxRate        int64 `json:"rx_rate"`
 	Signal        int
 	State         int
-	StateHt       bool `json:"state_ht"`
-	StatePwrmgt   bool `json:"state_pwrmgt"`
-	TxBytes       int  `json:"tx_bytes"`
-	TxPackets     int  `json:"tx_packets"`
-	TxPower       int  `json:"tx_power"`
-	TxRate        int  `json:"tx_rate"`
+	StateHt       bool  `json:"state_ht"`
+	StatePwrmgt   bool  `json:"state_pwrmgt"`
+	TxBytes       int64 `json:"tx_bytes"`
+	TxPackets     int64 `json:"tx_packets"`
+	TxPower       int64 `json:"tx_power"`
+	TxRate        int64 `json:"tx_rate"`
 	Uptime        int
 }
 

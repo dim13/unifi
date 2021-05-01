@@ -82,7 +82,7 @@ type WWW struct {
 	SpeedtestStatus  string  `json:"speedtest_status"`
 	Status           string  `json:"status"`
 	Subsystem        string  `json:"subsystem"`
-	TxBytesR         int     `json:"tx_bytes-r"`
+	TxBytesR         int64   `json:"tx_bytes-r"`
 	Uptime           int     `json:"uptime"`
 	XputDown         float64 `json:"xput_down"`
 	XputUp           float64 `json:"xput_up"`
