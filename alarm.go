@@ -48,7 +48,7 @@ func (u *Unifi) RawAlarms(site *Site, filter interface{}) ([]RawAlarm, error) {
 
 		alarmKey, ok := obj["key"].(string)
 		if !ok {
-			return nil, fmt.Errorf("Error on retrieving object type from raw Json")
+			return nil, fmt.Errorf("error on retrieving object type from raw json")
 		}
 
 		var ra RawAlarm

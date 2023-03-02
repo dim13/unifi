@@ -10,7 +10,6 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"io/ioutil"
 	"log"
 	"os"
 	"text/tabwriter"
@@ -55,12 +54,12 @@ func main() {
 
 	var devices []json.RawMessage
 
-	for i, _ := range rawDevices {
-		devices = append(devices, rawDevices[i].Data)
+	for _, v := range rawDevices {
+		devices = append(devices, v.Data)
 	}
 
 	json, _ := json.MarshalIndent(devices, "", "  ")
-	err = ioutil.WriteFile(*path, json, 0644)
+	err = os.WriteFile(*path, json, 0644)
 	if err != nil {
 		log.Fatalln(err)
 

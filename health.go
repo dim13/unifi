@@ -123,7 +123,7 @@ func (u *Unifi) Health(site *Site) (Health, error) {
 
 		subsystem, ok := obj["subsystem"].(string)
 		if !ok {
-			return health, fmt.Errorf("Error on retrieving subsystem from raw Json")
+			return health, fmt.Errorf("error on retrieving subsystem from raw json")
 		}
 
 		switch subsystem {

@@ -7,7 +7,7 @@ package unifi
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/url"
 	"reflect"
@@ -39,7 +39,7 @@ type NewVoucher struct {
 	Quota        string `json:"quota"`
 }
 
-//Value with parameters for create New Voucher
+// Value with parameters for create New Voucher
 var Nv NewVoucher
 
 func (u *Unifi) Voucher(site *Site) ([]Voucher, error) {
@@ -102,7 +102,7 @@ func (u *Unifi) apicmdNewVoucher(site *Site, cmd string) ([]byte, error) {
 	}
 
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
 		return nil, err
@@ -123,7 +123,7 @@ func (u *Unifi) parseNewVoucher(site *Site, cmd string, v interface{}) error {
 	}
 	m := reflect.ValueOf(v).Elem().FieldByName("Meta").Interface().(meta)
 	if m.Rc != "ok" {
-		return fmt.Errorf("Bad request: %s", m.Rc)
+		return fmt.Errorf("bad request: %s", m.Rc)
 	}
 	return nil
 }

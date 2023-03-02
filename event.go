@@ -490,7 +490,7 @@ func (u *Unifi) RawEvents(site *Site, filter interface{}) ([]RawEvent, error) {
 
 		eventKey, ok := obj["key"].(string)
 		if !ok {
-			return nil, fmt.Errorf("Error on retrieving object type from raw Json")
+			return nil, fmt.Errorf("error on retrieving object type from raw json")
 		}
 
 		var re RawEvent

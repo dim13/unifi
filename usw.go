@@ -143,15 +143,16 @@ type USWmap map[string]USW
 
 // Returns a slice of switches
 func (u *Unifi) USWs(site *Site) ([]USW, error) {
+	rawDevices, err := u.RawDevices(site, "usw")
+	if err != nil {
+		return nil, err
+	}
 
 	// Devices
 	var usws []USW
-
-	rawDevices, err := u.RawDevices(site, "usw")
-
-	for i, _ := range rawDevices {
+	for _, v := range rawDevices {
 		var usw USW
-		err := json.Unmarshal(rawDevices[i].Data, &usw)
+		err := json.Unmarshal(v.Data, &usw)
 		if err != nil {
 			return usws, err
 		}
@@ -160,7 +161,7 @@ func (u *Unifi) USWs(site *Site) ([]USW, error) {
 
 		usws = append(usws, usw)
 	}
-	return usws, err
+	return usws, nil
 }
 
 // Returns a map of access points with mac as a key
@@ -187,7 +188,7 @@ func (u *Unifi) USW(site *Site, name string) (*USW, error) {
 			return &d, nil
 		}
 	}
-	return nil, fmt.Errorf("No device with name: %s", name)
+	return nil, fmt.Errorf("no device with name: %s", name)
 }
 
 // Reboot access point

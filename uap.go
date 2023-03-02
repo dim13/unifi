@@ -296,15 +296,16 @@ func (u *Unifi) Aps(site *Site) ([]UAP, error) {
 
 // Returns a slice of access points
 func (u *Unifi) UAPs(site *Site) ([]UAP, error) {
+	rawDevices, err := u.RawDevices(site, "uap")
+	if err != nil {
+		return nil, err
+	}
 
 	// Devices
 	var uaps []UAP
-
-	rawDevices, err := u.RawDevices(site, "uap")
-
-	for i, _ := range rawDevices {
+	for _, v := range rawDevices {
 		var uap UAP
-		err := json.Unmarshal(rawDevices[i].Data, &uap)
+		err := json.Unmarshal(v.Data, &uap)
 		if err != nil {
 			return uaps, err
 		}
@@ -313,7 +314,7 @@ func (u *Unifi) UAPs(site *Site) ([]UAP, error) {
 
 		uaps = append(uaps, uap)
 	}
-	return uaps, err
+	return uaps, nil
 }
 
 // Returns a map of access points with mac as a key

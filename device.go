@@ -393,7 +393,7 @@ func (u *Unifi) RawDevices(site *Site, filter string) ([]RawDevice, error) {
 
 		deviceType, ok := obj["type"].(string)
 		if !ok {
-			return nil, fmt.Errorf("Error on retrieving object type from raw Json")
+			return nil, fmt.Errorf("error on retrieving object type from raw json")
 		}
 
 		switch filter {
@@ -595,15 +595,16 @@ type DeviceMap map[string]Device
 
 // Returns a slice of devices
 func (u *Unifi) Devices(site *Site, filter string) ([]Device, error) {
+	rawDevices, err := u.RawDevices(site, filter)
+	if err != nil {
+		return nil, err
+	}
 
 	// Devices
 	var devices []Device
-
-	rawDevices, err := u.RawDevices(site, filter)
-
-	for i, _ := range rawDevices {
+	for _, v := range rawDevices {
 		var device *Device
-		err := json.Unmarshal(rawDevices[i].Data, &device)
+		err := json.Unmarshal(v.Data, &device)
 		if err != nil {
 			return devices, err
 		}
@@ -613,7 +614,7 @@ func (u *Unifi) Devices(site *Site, filter string) ([]Device, error) {
 
 		devices = append(devices, *device)
 	}
-	return devices, err
+	return devices, nil
 }
 
 // Returns a map of access points with mac as a key

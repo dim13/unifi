@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/http/cookiejar"
@@ -115,7 +115,7 @@ func (u *Unifi) apicmd(site *Site, cmd string, payload interface{}) ([]byte, err
 	}
 
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -284,7 +284,7 @@ func (u *Unifi) PortProfile(site *Site, name string) (*PortProfile, error) {
 			return &p, err
 		}
 	}
-	return nil, fmt.Errorf("No Profile with name: %s", name)
+	return nil, fmt.Errorf("no profile with name: %s", name)
 }
 
 // Sets the portoverrides of a given device
