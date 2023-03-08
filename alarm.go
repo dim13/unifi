@@ -22,7 +22,7 @@ type RawAlarm struct {
 }
 
 // Returns a slice of json RawDevices as received by the controller
-func (u *Unifi) RawAlarms(site *Site, filter interface{}) ([]RawAlarm, error) {
+func (u *Unifi) RawAlarms(site *Site, filter any) ([]RawAlarm, error) {
 
 	var rawAlarms []RawAlarm
 
@@ -40,7 +40,7 @@ func (u *Unifi) RawAlarms(site *Site, filter interface{}) ([]RawAlarm, error) {
 	for _, d := range response.Data {
 
 		// unmarshal into a map to check the "type" field
-		var obj map[string]interface{}
+		var obj map[string]any
 		err := json.Unmarshal(d, &obj)
 		if err != nil {
 			return nil, err
@@ -60,7 +60,7 @@ func (u *Unifi) RawAlarms(site *Site, filter interface{}) ([]RawAlarm, error) {
 }
 
 // Returns a slice of json RawDevices as received by the controller
-func (u *Unifi) BasicAlarms(site *Site, filter interface{}) ([]BasicEvent, error) {
+func (u *Unifi) BasicAlarms(site *Site, filter any) ([]BasicEvent, error) {
 
 	var basicAlarms []BasicEvent
 

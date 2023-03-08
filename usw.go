@@ -24,11 +24,11 @@ type USW struct {
 	} `json:"config_network"`
 	ConnectRequestIP string `json:"connect_request_ip"`
 	//ConnectRequestPort int           `json:"connect_request_port"` //FIXME: Prior to 5.7.20 type string!
-	ConsideredLostAt     int           `json:"considered_lost_at"`
-	DeviceID             string        `json:"device_id"`
-	DhcpServerTable      []interface{} `json:"dhcp_server_table"`
-	Dot1XPortctrlEnabled bool          `json:"dot1x_portctrl_enabled"`
-	DownlinkTable        []interface{} `json:"downlink_table"`
+	ConsideredLostAt     int    `json:"considered_lost_at"`
+	DeviceID             string `json:"device_id"`
+	DhcpServerTable      []any  `json:"dhcp_server_table"`
+	Dot1XPortctrlEnabled bool   `json:"dot1x_portctrl_enabled"`
+	DownlinkTable        []any  `json:"downlink_table"`
 	EthernetTable        []struct {
 		Mac     string `json:"mac"`
 		Name    string `json:"name"`
@@ -60,7 +60,7 @@ type USW struct {
 	RxBytes            int64          `json:"rx_bytes"`
 	Serial             string         `json:"serial"`
 	SiteID             string         `json:"site_id"`
-	SSHSessionTable    []interface{}  `json:"ssh_session_table"`
+	SSHSessionTable    []any          `json:"ssh_session_table"`
 	Stat               struct {
 		Bytes    float64   `json:"bytes"`
 		Datetime time.Time `json:"datetime"`

@@ -464,7 +464,7 @@ type EVT_WU_RoamRadio struct {
 }
 
 // Returns a slice of json RawDevices as received by the controller
-func (u *Unifi) RawEvents(site *Site, filter interface{}) ([]RawEvent, error) {
+func (u *Unifi) RawEvents(site *Site, filter any) ([]RawEvent, error) {
 
 	var rawEvents []RawEvent
 
@@ -482,7 +482,7 @@ func (u *Unifi) RawEvents(site *Site, filter interface{}) ([]RawEvent, error) {
 	for _, d := range response.Data {
 
 		// unmarshal into a map to check the "type" field
-		var obj map[string]interface{}
+		var obj map[string]any
 		err := json.Unmarshal(d, &obj)
 		if err != nil {
 			return nil, err
@@ -502,7 +502,7 @@ func (u *Unifi) RawEvents(site *Site, filter interface{}) ([]RawEvent, error) {
 }
 
 // Returns a slice of json RawDevices as received by the controller
-func (u *Unifi) BasicEvents(site *Site, filter interface{}) ([]BasicEvent, error) {
+func (u *Unifi) BasicEvents(site *Site, filter any) ([]BasicEvent, error) {
 
 	var basicEvents []BasicEvent
 

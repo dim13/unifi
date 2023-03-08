@@ -111,7 +111,7 @@ func (u *Unifi) apicmdNewVoucher(site *Site, cmd string) ([]byte, error) {
 	return body, nil
 }
 
-func (u *Unifi) parseNewVoucher(site *Site, cmd string, v interface{}) error {
+func (u *Unifi) parseNewVoucher(site *Site, cmd string, v any) error {
 	body, err := u.apicmdNewVoucher(site, cmd)
 	if err != nil {
 		return err

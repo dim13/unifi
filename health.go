@@ -115,7 +115,7 @@ func (u *Unifi) Health(site *Site) (Health, error) {
 	for _, d := range response.Data {
 
 		// unmarshal into a map to check the "subsystem" field
-		var obj map[string]interface{}
+		var obj map[string]any
 		err := json.Unmarshal(d, &obj)
 		if err != nil {
 			return health, err

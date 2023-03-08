@@ -82,7 +82,7 @@ func (u *Unifi) Logout() {
 	u.client.Get(u.baseURL + "logout")
 }
 
-func (u *Unifi) apicmd(site *Site, cmd string, payload interface{}) ([]byte, error) {
+func (u *Unifi) apicmd(site *Site, cmd string, payload any) ([]byte, error) {
 
 	url := u.apiURL
 
@@ -122,7 +122,7 @@ func (u *Unifi) apicmd(site *Site, cmd string, payload interface{}) ([]byte, err
 	return body, nil
 }
 
-func (u *Unifi) apicmdPut(site *Site, cmd string, data interface{}) error {
+func (u *Unifi) apicmdPut(site *Site, cmd string, data any) error {
 
 	url := u.apiURL
 
@@ -185,7 +185,7 @@ func (u *Unifi) stacmd(mac, cmd string, min ...int) error {
 	return u.maccmd("stamgr", command{Mac: mac, Cmd: cmd, Minutes: minutes})
 }
 
-func (u *Unifi) maccmd(mgr string, args interface{}) error {
+func (u *Unifi) maccmd(mgr string, args any) error {
 	param, err := json.Marshal(args)
 	if err != nil {
 		return err
@@ -195,7 +195,7 @@ func (u *Unifi) maccmd(mgr string, args interface{}) error {
 	return err
 }
 
-func (u *Unifi) parse(site *Site, cmd string, payload interface{}, v interface{}) error {
+func (u *Unifi) parse(site *Site, cmd string, payload any, v any) error {
 	body, err := u.apicmd(site, cmd, payload)
 	if err != nil {
 		return err
